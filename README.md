@@ -19,3 +19,9 @@ package archivers like `autobuild-aoscarchive`.
 
 Since patches may vary on different platforms, abbs supports platform-specific patches. abbs also supports user-customized
 compiler flags, just like ebuild.
+
+### A. MetaData
+
+### B. Storage
+
+### C.
