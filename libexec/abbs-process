@@ -1,0 +1,6 @@
+#! /bin/bash
+# BOKU is the Kanji "僕". It means "I" or "me".
+export BOKU="`which $0`"
+# load the configuration using BOKU.
+. "`dirname $BOKU`/../env/base.sh"
+
