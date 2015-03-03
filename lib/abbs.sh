@@ -17,3 +17,15 @@ abbstmpf(){
 		fi
 	done
 }
+abbsallocenv(){
+	while true
+	do
+		fn=$ABBSENVPOS/$1-`date -u -Iseconds$`-RANDOM
+		if [ ! -e $fn ]
+		then
+			mkdir $fn
+			echo $fn
+			return 0
+		fi
+	done
+}

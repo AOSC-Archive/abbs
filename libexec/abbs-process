@@ -7,11 +7,40 @@ pm_checkdep $ABDEP || abdie "Dependencies are not satisfied for $1"
 
 . $ABBS/repo/$1/spec
 
+SPECSEC=`dirname $1`
+SPECNAM=`basename $1`
+
+BUILDENV="`abbsallocenv $SPECSEC-$SPECNAM`"
+
+echo "Preparing" >> $BUILDENV/.status
+
 if [ "x$SRCTBL" != "x" ]
 then
-	
+	TBLNM="`basename $SRCTBL`"
+	TBLNM="`echo $SRCTBL | cut -d ? -f 1`"
+	wget $SRCTBL -O $ABBSTBLPOS/$TBLNM
+	tar xvf $ABBSTBLPOS/$TBLNM -C $BUILDENV
 fi
+
+#TODO: Add more source retrieving methods, like git
+
+if  ["x$SUBDIR" = "x" ]
+then
+	[ ! -d $BUILDENV/`ls $BUILDENV` ] && 
+	abdie "Cannot determine the packing subdir."
+	SUBDIR=`ls $BUILDENV`
+fi
+
+echo "Building" >> $BUILDENV/.status
 
 for i in $ABBS/repo/$1/*
 do
+	[ ! -d $i ] || continue
+	rm -rf $BUILDENV/$SUBDIR/autobuild
+	cp -r $i $BUILDENV/$SUBDIR/autobuild
+	pushd $BUILDENV/$SUBDIR/$i
+	autobuild || abdie "Autobuild returns non-zero value"
+	popd
 done
+
+echo "Success" > $BUILDENV/.status

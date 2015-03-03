@@ -9,3 +9,5 @@ export ABBLPREFIX=$ABBS/lib
 abloadlib abbs
 
 export PATH=$ABBS/libexec:$PATH
+
+recsr $ABBS/etc/abbs/*
