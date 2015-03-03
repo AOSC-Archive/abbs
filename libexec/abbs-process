@@ -1,6 +1,17 @@
 #! /bin/bash
-# BOKU is the Kanji "僕". It means "I" or "me".
-export BOKU="`which $0`"
-# load the configuration using BOKU.
-. "`dirname $BOKU`/../env/base.sh"
+. $ABBS/env/base.sh
+abbscheckspec $1
 
+ABDEP="`abbscalcdep $1`"
+pm_checkdep $ABDEP || abdie "Dependencies are not satisfied for $1"
+
+. $ABBS/repo/$1/spec
+
+if [ "x$SRCTBL" != "x" ]
+then
+	
+fi
+
+for i in $ABBS/repo/$1/*
+do
+done
