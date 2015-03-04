@@ -1,0 +1,5 @@
+PKGNAME=abbs-unittest-foo-bar
+PKGVER=0
+PKGDES="ABBS Unittest foo bar package"
+PKGSEC=test
+PKGDEP="abbs-unittest-foo-baz"
