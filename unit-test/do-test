@@ -1,0 +1,21 @@
+#! /bin/bash
+[ -e /tmp/abbs-test ] && rm -rf /tmp/abbs-test
+mkdir /tmp/abbs-test
+cp -r ../* /tmp/abbs-test
+if [ -e /etc/abbs/prefix ]
+then
+mv /etc/abbs/prefix /etc/abbs/real-prefix
+echo "/tmp/abbs-test" > /etc/abbs/prefix
+fi
+
+export ABBS=/tmp/abbs-test
+
+for i in /tmp/abbs-test/unit-test/tests/*
+do
+$i
+done
+if [ -e /etc/abbs/real-prefix ]
+then
+rm /etc/abbs/prefix
+mv /etc/abbs/real-prefix /etc/abbs/prefix
+fi

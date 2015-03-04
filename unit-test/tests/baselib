@@ -1,0 +1,11 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+for i in yes Y true T 1
+do
+bool $i && echo OK : bool $i || echo FAILED : bool $i
+done
+pushd /tmp >/dev/null
+rm -f ablog
+echo TESTING INFO : ablog | ablog 
+grep "TESTING" ablog >/dev/null 1>&2 && echo OK : ablog || echo FAILED : ablog
+popd >/dev/null
