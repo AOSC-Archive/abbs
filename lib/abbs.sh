@@ -20,7 +20,7 @@ abbstmpf(){
 abbsallocenv(){
 	while true
 	do
-		fn=$ABBSENVPOS/$1-`date -u -Iseconds`-RANDOM
+		fn=$ABBSENVPOS/$1-`date -u -Iseconds`-$RANDOM
 		if [ ! -e $fn ]
 		then
 			mkdir $fn

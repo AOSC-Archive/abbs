@@ -1,2 +1,2 @@
-mkdir -p abdist/var/abbs/test/playground
+mkdir -p abdist/var/abbs/test/playground/etb/foobuild
 echo OK > abdist/var/abbs/test/playground/etb/foobuild/b

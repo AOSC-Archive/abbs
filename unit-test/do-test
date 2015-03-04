@@ -1,5 +1,7 @@
 #! /bin/bash
+export TESTLOG="/var/log/abbs-test.log"
 [ -e /tmp/abbs-test ] && rm -rf /tmp/abbs-test
+mkdir -p /var/lib/abbs/build
 mkdir /tmp/abbs-test
 cp -r ../* /tmp/abbs-test
 mv /tmp/abbs-test/unit-test/test-spec /tmp/abbs-test/repo

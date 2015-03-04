@@ -17,14 +17,13 @@ abreqexe(){
 # So ugly...
 
 abloadpm(){
-	[ -f $AB/$ABMPM/lib/pm.sh ] || return 1
         . $AB/$ABMPM/lib/pm.sh
 	export ABLIBS="${ABLIBS}pm|"	
 	echo "Loaded library pm" 1>&2
 }
 
 abloadlib(){
-	if [ "x$1" = "pm" ] 
+	if [ "x$1" = "xpm" ] 
 	then
 		abloadpm
 		return

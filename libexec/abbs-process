@@ -29,7 +29,7 @@ fi
 
 #TODO: Add more source retrieving methods, like git
 
-if  ["x$SUBDIR" = "x" ]
+if [ "x$SUBDIR" = "x" ]
 then
 	[ ! -d $BUILDENV/`ls $BUILDENV` ] && 
 	abdie "Cannot determine the packing subdir."
@@ -40,10 +40,11 @@ echo "Building" >> $BUILDENV/.status
 
 for i in $ABBS/repo/$1/*
 do
-	[ ! -d $i ] || continue
+	[ ! -d $i ] && continue
 	rm -rf $BUILDENV/$SUBDIR/autobuild
+	rm -rf $BUILDENV/$SUBDIR/abdist
 	cp -r $i $BUILDENV/$SUBDIR/autobuild
-	pushd $BUILDENV/$SUBDIR/$i
+	pushd $BUILDENV/$SUBDIR
 	autobuild || abdie "Autobuild returns non-zero value"
 	popd
 done
