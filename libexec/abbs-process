@@ -2,6 +2,8 @@
 . $ABBS/env/base.sh
 abbscheckspec $1
 
+abrequire pm
+
 ABDEP="`abbscalcdep $1`"
 pm_checkdep $ABDEP || abdie "Dependencies are not satisfied for $1"
 
