@@ -11,6 +11,7 @@ fi
 
 export ABBS=/tmp/abbs-test
 
+
 for i in /tmp/abbs-test/unit-test/tests/*
 do
 $i

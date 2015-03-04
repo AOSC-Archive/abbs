@@ -1,0 +1,5 @@
+PKGNAME=abbs-unittest-etb-foobuild-a
+PKGVER=0
+PKGDES="ABBS Unittest etb foobuild package"
+PKGSEC=test
+PKGDEP="glibc gcc"

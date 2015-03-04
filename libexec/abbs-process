@@ -22,6 +22,9 @@ then
 	TBLNM="`echo $SRCTBL | cut -d ? -f 1`"
 	wget $SRCTBL -O $ABBSTBLPOS/$TBLNM
 	tar xvf $ABBSTBLPOS/$TBLNM -C $BUILDENV
+elif bool $DUMMYSRC
+then
+	mkdir $BUILDENV/dummy
 fi
 
 #TODO: Add more source retrieving methods, like git

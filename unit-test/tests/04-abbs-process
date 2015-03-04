@@ -1,0 +1,9 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+
+rm -f /var/abbs/test/playground/etb/foobuild/*
+
+abbs-process etb/foobuild
+[ -e /var/abbs/test/playground/etb/foobuild/a ] || ( echo FAILED : abbs-process ; exit 1)
+[ -e /var/abbs/test/playground/etb/foobuild/b ] || ( echo FAILED : abbs-process ; exit 1)
+echo OK : abbs-process
