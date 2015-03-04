@@ -20,7 +20,7 @@ abloadpm(){
 	[ -f $AB/$ABMPM/lib/pm.sh ] || return 1
         . $AB/$ABMPM/lib/pm.sh
 	export ABLIBS="${ABLIBS}pm|"	
-	echo "Loaded library pm"
+	echo "Loaded library pm" 1>&2
 }
 
 abloadlib(){
@@ -32,7 +32,7 @@ abloadlib(){
 	[ -f $ABBLPREFIX/$1.sh ] || return 1
 	. $ABBLPREFIX/$1.sh
 	export ABLIBS="${ABLIBS}$1|"
-	echo "Loaded library $1"
+	echo "Loaded library $1" 1>&2
 }
 
 abrequire(){

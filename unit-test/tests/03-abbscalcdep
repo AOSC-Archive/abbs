@@ -1,0 +1,5 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+
+( abbscalcdep foo/baz | diff - $ABBS/unit-test/test-data/abbscalcdep ) && echo OK : abbscalcdep || echo FAILED : abbscalcdep
+
