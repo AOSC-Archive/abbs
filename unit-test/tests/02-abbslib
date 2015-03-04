@@ -4,3 +4,16 @@
 #TEST : abbscheckspec
 $ABBS/unit-test/tests-libexec/abbslib-abbscheckspec foo/bar 2>/dev/null 1>&2 && echo OK : abbscheckspec || echo FAILED : abbscheckspec
 $ABBS/unit-test/tests-libexec/abbslib-abbscheckspec error/how_can_i_exist 2>/dev/null 1>&2 && echo FAILED : abbscheckspec || echo OK : abbscheckspec
+
+#TEST : abbstmpf
+rm `abbstmpf` && echo OK : abbstmpf || echo FAILED : abbstmpf
+
+#TEST : abbsallocenv
+export ABBSENVPOS=/tmp
+ENV="`abbsallocenv foo-bar`"
+[ -d $ENV ] && echo OK : abbsallocenv || echo FAILED : abbsallocenv
+echo TESTING INGO : $ENV
+rm -rf $ENV
+unset ABBSENVPOS
+
+
