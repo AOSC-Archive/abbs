@@ -1,0 +1,5 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+
+#TEST : abbscheckspec
+abbscheckspec $1

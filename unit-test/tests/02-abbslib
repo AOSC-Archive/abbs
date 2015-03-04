@@ -1,0 +1,6 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+
+#TEST : abbscheckspec
+$ABBS/unit-test/tests-libexec/abbslib-abbscheckspec foo/bar 2>/dev/null 1>&2 && echo OK : abbscheckspec || echo FAILED : abbscheckspec
+$ABBS/unit-test/tests-libexec/abbslib-abbscheckspec error/how_can_i_exist 2>/dev/null 1>&2 && echo FAILED : abbscheckspec || echo OK : abbscheckspec
