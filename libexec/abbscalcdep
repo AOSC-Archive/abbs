@@ -11,7 +11,7 @@ do
 	do
 		echo $j >> $TMPF1
 	done
-	cat $TMPF1 | uniq > $TMPF2
+	cat $TMPF1 | sort | uniq > $TMPF2
 	cat $TMPF2 > $TMPF1
 done
 RES="`cat $TMPF1`"

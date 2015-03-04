@@ -24,8 +24,13 @@ abloadpm(){
 }
 
 abloadlib(){
+	if [ "x$1" = "pm" ] 
+	then
+		abloadpm
+		return
+	fi
 	[ -f $ABBLPREFIX/$1.sh ] || return 1
-	. $AB/$1.sh
+	. $ABBLPREFIX/$1.sh
 	export ABLIBS="${ABLIBS}$1|"
 	echo "Loaded library $1"
 }
