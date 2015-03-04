@@ -1,0 +1,6 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+
+( abbsfindsource abbs-unittest-foo-bar | grep foo/bar >/dev/null 2>&1 ) && echo OK : abbsfindsource foo/bar || echo FAILED : abbsfindsource foo/bar
+( abbsfindsource abbs-unittest-foo-baz-a | grep foo/baz >/dev/null 2>&1 ) && echo OK : abbsfindsource foo/baz || echo FAILED : abbsfindsource foo/baz
+abbsfindsource abbs-unittest && echo FAILED : abbsfindsource abbs-unittest || echo OK : abbsfindsource abbs-unittest

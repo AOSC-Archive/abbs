@@ -1,0 +1,15 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+for i in $ABBS/repo/*/*/*
+do
+	[ ! -d $i ] && continue
+	grep ^PKGNAME=$1\$ $i/defines 2>/dev/null 1>&2 || continue
+	SUBNAME=`basename $i`
+	SPECNAME=`dirname $i`
+	SECNAME=`dirname $SPECNAME`
+	SPECNAME=`basename $SPECNAME`
+	SECNAME=`basename $SECNAME`
+	echo $SECNAME/$SPECNAME
+	exit 0
+done
+exit 1

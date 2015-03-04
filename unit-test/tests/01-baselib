@@ -10,10 +10,9 @@ done
 #TEST : ablog
 pushd /tmp >/dev/null
 rm -f ablog
-echo TESTING INFO : ablog | ablog 
-grep "TESTING" ablog >/dev/null 1>&2 && echo OK : ablog || echo FAILED : ablog
+echo TESTING INFO : ablog | ablog 2>/dev/null 1>&2
+grep "TESTING" ablog 2>/dev/null 1>&2 && echo OK : ablog || echo FAILED : ablog
 popd >/dev/null
 
 #TEST : abcommaprint
-printf "TESTING INFO : "
-abcommaprint a b c | grep "a \\, b \\, c" >/dev/null 1>&2 && echo OK : abcommaprint || echo FAILED : abcommaprint
+abcommaprint a b c | grep "a \\, b \\, c" 2>/dev/null 1>&2 && echo OK : abcommaprint || echo FAILED : abcommaprint

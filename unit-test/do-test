@@ -13,11 +13,15 @@ fi
 
 export ABBS=/tmp/abbs-test
 
-
+if [ "x$1" = "x" ]
+then
 for i in /tmp/abbs-test/unit-test/tests/*
 do
 $i
 done
+else
+/tmp/abbs-test/unit-test/tests/*-$1
+fi
 if [ -e /etc/abbs/real-prefix ]
 then
 rm /etc/abbs/prefix
