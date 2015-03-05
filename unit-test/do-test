@@ -17,6 +17,7 @@ if [ "x$1" = "x" ]
 then
 for i in /tmp/abbs-test/unit-test/tests/*
 do
+dpkg -r `dpkg -l 'abbs-unittest*' | grep "^ii" | awk '{ print $2; }'` 2>/dev/null 1>&2
 $i
 done
 else
