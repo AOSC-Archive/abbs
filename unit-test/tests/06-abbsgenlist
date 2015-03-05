@@ -1,0 +1,5 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+
+( abbsgenlist foo/bar | diff - $ABBS/unit-test/test-data/abbsgenlist ) && echo OK : abbsgenlist || echo FAILED : abbsgenlist
+

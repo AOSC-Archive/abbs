@@ -1,0 +1,5 @@
+PKGNAME=abbs-unittest-foo-baa
+PKGVER=0
+PKGDES="ABBS Unittest foo baa package"
+PKGSEC=misc
+PKGDEP="glibc"

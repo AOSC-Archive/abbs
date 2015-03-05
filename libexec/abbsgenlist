@@ -1,0 +1,50 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+abbscheckspec $1
+
+abrequire pm
+
+add_if_not_exist(){
+	grep "^$2\$" $1 2>/dev/null 1>&2 || echo $2 >> $1
+}
+
+TMPF="`abbstmpf`"
+for i
+do
+	DEP="`abbscalcdep $1`"
+	for j in $DEP
+	do
+		if pm_checkdep $j
+		then
+			continue
+		fi
+		SOURCE="`abbsfindsource $j`"
+		if [ "x$SOURCE" = "x" ]
+		then
+			if [ "x$2" = "xr" ]
+			then
+				echo "Cannot find the specification for package $j"
+				exit 1
+			fi
+			abdie "Cannot find the specification for package $j"
+		fi
+		SUBLIST="`abbsgenlist $SOURCE r`"
+		if echo $SUBLIST | grep "^Cannot find the" >/dev/null 2>&1
+		then
+			if [ "x$2" = "xr" ]
+			then
+				echo "$SUBLIST"
+				exit 1
+			fi
+			abdie "Sub abbsgenlist returned non-zero. Error infomation: $SUBLIST"
+		fi
+		for k in $SUBLIST
+		do
+			add_if_not_exist $TMPF $k
+		done
+		add_if_not_exist $TMPF $j
+	done
+done
+LIST="`cat $TMPF`"
+# rm -f $TMPF
+echo $LIST
