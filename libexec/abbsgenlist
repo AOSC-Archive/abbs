@@ -9,7 +9,7 @@ add_if_not_exist(){
 }
 
 TMPF="`abbstmpf`"
-for i
+for i in $1
 do
 	DEP="`abbscalcdep $1`"
 	for j in $DEP
@@ -42,8 +42,8 @@ do
 		do
 			add_if_not_exist $TMPF $k
 		done
-		add_if_not_exist $TMPF $j
 	done
+	add_if_not_exist $TMPF $1
 done
 LIST="`cat $TMPF`"
 # rm -f $TMPF
