@@ -1,0 +1,12 @@
+#! /bin/bash
+
+export ABBS=`cat /etc/abbs/prefix`
+. $ABBS/env/base.sh
+
+LIST="`abbsgenall $*`"
+for i in $LIST
+do
+	abbs-process $i
+done
+
+

@@ -1,0 +1,26 @@
+#! /bin/bash
+. $ABBS/env/base.sh
+abbscheckspec $1
+
+abrequire pm
+
+add_if_not_exist(){
+	grep "^$2\$" $1 2>/dev/null 1>&2 || echo $2 >> $1
+}
+
+TMPF="`abbstmpf`"
+for i
+do
+	RES="`abbsgenlist $i`"
+	if [ "x$?" != "x0" ]
+	then
+		abdie "abbsgenlist returned non-zero value."
+	fi
+	for j in $RES
+	do
+		add_if_not_exist $TMPF $j
+	done
+done
+LIST="`cat $TMPF`"
+rm -f $TMPF
+echo $LIST

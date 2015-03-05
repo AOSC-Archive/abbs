@@ -46,5 +46,5 @@ do
 	add_if_not_exist $TMPF $1
 done
 LIST="`cat $TMPF`"
-# rm -f $TMPF
+rm -f $TMPF
 echo $LIST
