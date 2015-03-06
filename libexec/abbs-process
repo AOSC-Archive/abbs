@@ -19,8 +19,8 @@ echo "Preparing" >> $BUILDENV/.status
 if [ "x$SRCTBL" != "x" ]
 then
 	TBLNM="`basename $SRCTBL`"
-	TBLNM="`echo $SRCTBL | cut -d ? -f 1`"
-	wget $SRCTBL -O $ABBSTBLPOS/$TBLNM
+	TBLNM="`echo $TBLNM | cut -d \? -f 1`"
+	[ ! -e $ABBSTBLPOS/$TBLNM ] && wget $SRCTBL -O $ABBSTBLPOS/$TBLNM
 	tar xvf $ABBSTBLPOS/$TBLNM -C $BUILDENV
 elif bool $DUMMYSRC
 then

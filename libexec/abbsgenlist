@@ -18,7 +18,7 @@ do
 		then
 			continue
 		fi
-		if pm_repoinstall $j
+		if pm_repoinstall $j >/dev/tty </dev/tty
 		then
 			continue
 		fi
