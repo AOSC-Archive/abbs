@@ -18,6 +18,10 @@ do
 		then
 			continue
 		fi
+		if pm_repoinstall $j
+		then
+			continue
+		fi
 		SOURCE="`abbsfindsource $j`"
 		if [ "x$SOURCE" = "x" ]
 		then

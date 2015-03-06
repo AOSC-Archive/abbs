@@ -1,7 +1,7 @@
 abbscheckspec(){
 	if [ ! -d $ABBS/repo/$1 ]
 	then
-		abdie "No such package specification."
+		abdie "No such package specification $1."
 	fi
 	
 }
