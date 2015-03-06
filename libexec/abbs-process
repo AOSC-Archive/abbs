@@ -44,6 +44,10 @@ do
 	rm -rf $BUILDENV/$SUBDIR/autobuild
 	rm -rf $BUILDENV/$SUBDIR/abdist
 	cp -r $i $BUILDENV/$SUBDIR/autobuild
+	if [ "x$VER" != "x" ]
+	then
+		echo "PKGVER=$VER" >> $BUILDENV/$SUBDIR/autobuild/defines
+	fi
 	pushd $BUILDENV/$SUBDIR
 	autobuild || abdie "Autobuild returns non-zero value"
 	popd
