@@ -1,0 +1,17 @@
+#! /bin/bash
+
+export ABBS=`cat /etc/abbs/prefix`
+. $ABBS/env/base.sh
+
+for i
+do
+	if echo $i | grep ^groups/ >/dev/null
+	then
+		L="$L `cat $ABBS/repo/$i`"
+	else
+		L="$L $i"
+	fi
+done
+
+exec $ABBS/abbs-build-mini $L
+
