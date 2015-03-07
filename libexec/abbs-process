@@ -21,7 +21,11 @@ then
 	TBLNM="`basename $SRCTBL`"
 	TBLNM="`echo $TBLNM | cut -d \? -f 1`"
 	[ ! -e $ABBSTBLPOS/$TBLNM ] && wget $SRCTBL -O $ABBSTBLPOS/$TBLNM
-	tar xvf $ABBSTBLPOS/$TBLNM -C $BUILDENV
+	# tar xvf $ABBSTBLPOS/$TBLNM -C $BUILDENV
+    # Adapting abbsuniformextract here.
+    pushd $BUILDENV
+    $ABBS/libexec/abbsuniformextract $ABBSTBLPOS/$TBLNM
+    popd
 elif bool $DUMMYSRC
 then
 	mkdir $BUILDENV/dummy
