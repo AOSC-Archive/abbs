@@ -31,7 +31,64 @@ then
 	mkdir $BUILDENV/dummy
 fi
 
-#TODO: Add more source retrieving methods, like git
+if [ "x$GITSRC" != "x" ]
+then
+	GITNM="`basename $GITSRC`"
+	GITNM="`echo $GITNM | cut -d \? -f 1`"
+    if [ "x$GITBRCH" != "x" ]
+    then
+        [ ! -e $ABBSTBLPOS/$GITNM ] && git clone -b $GITBRCH $GITSRC -C $ABBSTBLPOS $GITNM
+    else
+    	[ ! -e $ABBSTBLPOS/$GITNM ] && git clone $GITSRC -C $ABBSTBLPOS $GITNM
+    fi
+    if [ "x$GITCO" != "x" ]
+    then
+        pushd $ABBSTBLPOS/$GITNM
+        git checkout tags/$GITCO
+        popd
+    else
+        true
+    fi
+elif bool $DUMMYSRC
+then
+	mkdir $BUILDENV/dummy
+fi
+
+if [ "x$SVNSRC" != "x" ]
+then
+	SVNNM="`basename $SVNSRC`"
+	SVNNM="`echo $SVNNM | cut -d \? -f 1`"
+   	[ ! -e $ABBSTBLPOS/$SVNNM ] && pushd $ABBSTBLPOS; \
+                                                                      svn co --quiet $SVNSRC; \
+                                                                      popd
+elif bool $DUMMYSRC
+then
+	mkdir $BUILDENV/dummy
+fi
+
+if [ "x$HGSRC" != "x" ]
+then
+	HGNM="`basename $HGSRC`"
+	HGNM="`echo $HGNM | cut -d \? -f 1`"
+   	[ ! -e $ABBSTBLPOS/$HGNM ] && pushd $ABBSTBLPOS; \
+                                                                    hg clone $HGSRC; \
+                                                                    popd
+elif bool $DUMMYSRC
+then
+	mkdir $BUILDENV/dummy
+fi
+
+if [ "x$BZRSRC" != "x" ]
+then
+	BZRNM="`basename $BZRSRC`"
+	BZRNM="`echo $BZRNM | cut -d \? -f 1`"
+   	[ ! -e $ABBSTBLPOS/$BZRNM ] && pushd $ABBSTBLPOS; \
+                                                                      bzr branch $BZRSRC; \
+                                                                      popd
+elif bool $DUMMYSRC
+then
+	mkdir $BUILDENV/dummy
+fi
 
 if [ "x$SUBDIR" = "x" ]
 then
