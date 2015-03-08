@@ -58,9 +58,15 @@ if [ "x$SVNSRC" != "x" ]
 then
 	SVNNM="`basename $SVNSRC`"
 	SVNNM="`echo $SVNNM | cut -d \? -f 1`"
+	if [ "xSVNCO" != "x" ]; then
    	[ ! -e $ABBSTBLPOS/$SVNNM ] && pushd $ABBSTBLPOS; \
-                                                                      svn co --quiet $SVNSRC; \
-                                                                      popd
+                                       svn co -r $SVNCO --quiet $SVNSRC $SVNNM; \
+                                       popd
+        else
+   	[ ! -e $ABBSTBLPOS/$SVNNM ] && pushd $ABBSTBLPOS; \
+                                       svn co --quiet $SVNSRC $SVNNM; \
+                                       popd
+        fi
 elif bool $DUMMYSRC
 then
 	mkdir $BUILDENV/dummy
