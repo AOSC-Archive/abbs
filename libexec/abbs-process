@@ -26,12 +26,7 @@ then
     pushd $BUILDENV
     $ABBS/libexec/abbsuniformextract $ABBSTBLPOS/$TBLNM
     popd
-elif bool $DUMMYSRC
-then
-	mkdir $BUILDENV/dummy
-fi
-
-if [ "x$GITSRC" != "x" ]
+elif [ "x$GITSRC" != "x" ]
 then
 	GITNM="`basename $GITSRC`"
 	GITNM="`echo $GITNM | cut -d \? -f 1`"
@@ -49,12 +44,7 @@ then
     else
         true
     fi
-elif bool $DUMMYSRC
-then
-	mkdir $BUILDENV/dummy
-fi
-
-if [ "x$SVNSRC" != "x" ]
+elif [ "x$SVNSRC" != "x" ]
 then
 	SVNNM="`basename $SVNSRC`"
 	SVNNM="`echo $SVNNM | cut -d \? -f 1`"
@@ -67,24 +57,14 @@ then
                                        svn co --quiet $SVNSRC $SVNNM; \
                                        popd
         fi
-elif bool $DUMMYSRC
-then
-	mkdir $BUILDENV/dummy
-fi
-
-if [ "x$HGSRC" != "x" ]
+elif [ "x$HGSRC" != "x" ]
 then
 	HGNM="`basename $HGSRC`"
 	HGNM="`echo $HGNM | cut -d \? -f 1`"
    	[ ! -e $ABBSTBLPOS/$HGNM ] && pushd $ABBSTBLPOS; \
                                                                     hg clone $HGSRC; \
                                                                     popd
-elif bool $DUMMYSRC
-then
-	mkdir $BUILDENV/dummy
-fi
-
-if [ "x$BZRSRC" != "x" ]
+elif [ "x$BZRSRC" != "x" ]
 then
 	BZRNM="`basename $BZRSRC`"
 	BZRNM="`echo $BZRNM | cut -d \? -f 1`"
