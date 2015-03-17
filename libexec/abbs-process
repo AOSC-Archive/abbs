@@ -95,6 +95,10 @@ do
 	then
 		echo "PKGVER=$VER" >> $BUILDENV/$SUBDIR/autobuild/defines
 	fi
+	if [ "x$REL" != "x" ]
+	then
+		echo "PKGREL=$REL" >> $BUILDENV/$SUBDIR/autobuild/defines
+	fi
 	pushd $BUILDENV/$SUBDIR
 	autobuild || abdie "Autobuild returns non-zero value"
 	popd
