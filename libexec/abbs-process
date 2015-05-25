@@ -24,6 +24,11 @@ then
 	# tar xvf $ABBSTBLPOS/$TBLNM -C $BUILDENV
     # Adapting abbsuniformextract here.
     pushd $BUILDENV
+    if bool $SRCNOSUBDIR
+    then
+	    mkdir -p tmp 
+	    cd tmp
+    fi
     $ABBS/libexec/abbsuniformextract $ABBSTBLPOS/$TBLNM
     popd
 elif [ "x$GITSRC" != "x" ]
