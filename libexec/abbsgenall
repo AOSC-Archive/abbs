@@ -17,5 +17,5 @@ do
 		add_if_not_exist $TMPF $j
 	done
 done
-cat "$(abbstmpf)"
-rm -f "$(abbstmpf)"
+cat "$TMPF"
+rm -f "$TMPF"

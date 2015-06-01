@@ -5,7 +5,7 @@ export ABBS=`cat /etc/abbs/prefix`
 
 for i
 do
-	if echo $i | grep ^groups/ >/dev/null
+	if echo $i | grep -q ^groups/
 	then
 		L="$L `cat $ABBS/repo/$i`"
 	else
@@ -14,4 +14,3 @@ do
 done
 
 exec $ABBS/abbs-build-mini $L
-
