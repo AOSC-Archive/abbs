@@ -12,8 +12,4 @@ export PATH=$ABBS/libexec:$PATH
 
 recsr $ABBS/etc/abbs/*
 
-for i in `cat $ABBS/params/*`
-do
-        export $i
-done
-
+export $(cat $ABBS/params/*)

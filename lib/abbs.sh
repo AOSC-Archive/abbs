@@ -1,10 +1,6 @@
-abbscheckspec(){
-	if [ ! -d $ABBS/repo/$1 ]
-	then
-		abdie "No such package specification $1."
-	fi
-	
-}
+#!/bin/bash
+aosc_lib abbs
+abbscheckspec(){ [ -d $ABBS/repo/$1 ] || abdie "No such package specification $1."; }
 abbstmpf(){
 	while true
 	do
@@ -20,7 +16,7 @@ abbstmpf(){
 abbsallocenv(){
 	while true
 	do
-		fn=$ABBSENVPOS/$1-`date -u +%y%m%d%H%M%S`-$RANDOM
+		fn=$ABBSENVPOS/$1-$(date -u +%s)-$RANDOM
 		if [ ! -e $fn ]
 		then
 			mkdir $fn
