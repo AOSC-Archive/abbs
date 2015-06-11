@@ -61,7 +61,7 @@ fi
 # End Sub source_getter()
 
 
-[ -d "$BUILDENV/${SUBDIR=$(echo "$BUILDENV"/*)}" ] ||
+[ -d "${SUBDIR=$(echo "$BUILDENV"/*)}" ] ||
 	abdie "Cannot determine the packing subdir."
 
 echo "Building" >> $BUILDENV/.status
@@ -69,18 +69,18 @@ echo "Building" >> $BUILDENV/.status
 for i in $ABBS/repo/$1/*
 do
 	[ ! -d $i ] && continue
-	rm -rf $BUILDENV/$SUBDIR/autobuild
-	rm -rf $BUILDENV/$SUBDIR/abdist
-	cp -r $i $BUILDENV/$SUBDIR/autobuild
+	rm -rf $SUBDIR/autobuild
+	rm -rf $SUBDIR/abdist
+	cp -r $i $SUBDIR/autobuild
 	if [ "x$VER" != "x" ]
 	then
-		echo "PKGVER=$VER" >> $BUILDENV/$SUBDIR/autobuild/defines
+		echo "PKGVER=$VER" >> $SUBDIR/autobuild/defines
 	fi
 	if [ "x$REL" != "x" ]
 	then
-		echo "PKGREL=$REL" >> $BUILDENV/$SUBDIR/autobuild/defines
+		echo "PKGREL=$REL" >> $SUBDIR/autobuild/defines
 	fi
-	pushd $BUILDENV/$SUBDIR
+	pushd $SUBDIR
 	autobuild || abdie "Autobuild returns non-zero value $?"
 	popd
 done
