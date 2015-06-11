@@ -60,27 +60,21 @@ then
 fi
 # End Sub source_getter()
 
-
-[ -d "${SUBDIR=$(echo "$BUILDENV"/*)}" ] ||
+_arg_first(){ echo "$1"; } # auto-lambda: first arg, first file in wildcard
+[ -d "$BUILDENV/${SUBDIR=$(cd "$BUILDENV"; _arg_first *)}" ] ||
 	abdie "Cannot determine the packing subdir."
+unset _arg_first
 
 echo "Building" >> $BUILDENV/.status
 
 for i in $ABBS/repo/$1/*
 do
-	[ ! -d $i ] && continue
-	rm -rf $SUBDIR/autobuild
-	rm -rf $SUBDIR/abdist
-	cp -r $i $SUBDIR/autobuild
-	if [ "x$VER" != "x" ]
-	then
-		echo "PKGVER=$VER" >> $SUBDIR/autobuild/defines
-	fi
-	if [ "x$REL" != "x" ]
-	then
-		echo "PKGREL=$REL" >> $SUBDIR/autobuild/defines
-	fi
-	pushd $SUBDIR
+	[ -d $i ] || continue
+	rm -rf $BUILDENV/$SUBDIR/{autobuild,abdist}
+	cp -r $i $BUILDENV/$SUBDIR/autobuild
+	[ "$VER" ] && echo "PKGVER=$VER" >> $BUILDENV/$SUBDIR/autobuild/defines
+	[ "$REL" ] && echo "PKGREL=$REL" >> $BUILDENV/$SUBDIR/autobuild/defines
+	pushd $BUILDENV/$SUBDIR
 	autobuild || abdie "Autobuild returns non-zero value $?"
 	popd
 done
