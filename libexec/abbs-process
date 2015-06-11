@@ -35,6 +35,7 @@ then
 	$ABBS/libexec/abbsuniformextract $ABBSTBLPOS/$SRCNM
 	popd
 elif [ ! -e $ABBSTBLPOS/$SRCNM ] # Sub source_ctrl_getter() <misaka_generated_goto_alt>
+then
 	pushd $ABBSTBLPOS
 	if [ "$GITSRC" ]
 	then
