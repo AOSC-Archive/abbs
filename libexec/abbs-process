@@ -37,13 +37,13 @@ then
 	GITNM="`echo $GITNM | cut -d \? -f 1`"
     if [ "x$GITBRCH" != "x" ]
     then
-        [ ! -e $ABBSTBLPOS/$GITNM ] && git clone -b $GITBRCH $GITSRC -C $ABBSTBLPOS $GITNM
+        [ ! -e $ABBSTBLPOS/$GITNM ] && git clone -b $GITBRCH $GITSRC $BUILDENV/$GITNM
     else
-    	[ ! -e $ABBSTBLPOS/$GITNM ] && git clone $GITSRC -C $ABBSTBLPOS $GITNM
+    	[ ! -e $ABBSTBLPOS/$GITNM ] && git clone $GITSRC $BUILDENV/$GITNM
     fi
     if [ "x$GITCO" != "x" ]
     then
-        pushd $ABBSTBLPOS/$GITNM
+        pushd $BUILDENV/$GITNM
         git checkout tags/$GITCO
         popd
     else
