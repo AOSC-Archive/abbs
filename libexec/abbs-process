@@ -16,96 +16,66 @@ BUILDENV="`abbsallocenv $SPECSEC-$SPECNAM`"
 
 echo "Preparing" >> $BUILDENV/.status
 
-if [ "x$SRCTBL" != "x" ]
+# auto-routine-matcher: share popd and pushd, merge tempvars
+# lint-warning: suggesting double-quoting
+# human-guess: `[ -e TARGET/MARK ] || pushd` may cause problems, guessing meaning.
+# Sub source_getter() <fileio>
+SRCNM="$(basename ${SRCTBL-${GITSRC-${SVNSRC-${HGSRC-${BZRSRC-.}}}}} | cut -d \? -f 1)" # suppress non-exist testing by using self.
+if [ "$SRCTBL" ]
 then
-	TBLNM="`basename $SRCTBL`"
-	TBLNM="`echo $TBLNM | cut -d \? -f 1`"
-	[ ! -e $ABBSTBLPOS/$TBLNM ] && wget $SRCTBL -O $ABBSTBLPOS/$TBLNM
-	# tar xvf $ABBSTBLPOS/$TBLNM -C $BUILDENV
-    # Adapting abbsuniformextract here.
-    pushd $BUILDENV
-    if bool $SRCNOSUBDIR
-    then
-	    mkdir -p tmp 
-	    cd tmp
-    fi
-    $ABBS/libexec/abbsuniformextract $ABBSTBLPOS/$TBLNM
-    popd
-elif [ "x$GITSRC" != "x" ]
+	[ -e $ABBSTBLPOS/$SRCNM ] || wget "$SRCTBL" -O $ABBSTBLPOS/$SRCNM
+	# tar xvf $ABBSTBLPOS/$SRCNM -C $BUILDENV
+	# Adapting abbsuniformextract here.
+	pushd $BUILDENV
+	if bool $SRCNOSUBDIR
+	then
+		mkdir -p tmp 
+		cd tmp
+	fi
+	$ABBS/libexec/abbsuniformextract $ABBSTBLPOS/$SRCNM
+	popd
+elif [ ! -e $ABBSTBLPOS/$SRCNM ] # Sub source_ctrl_getter() <misaka_generated_goto_alt>
 then
-	GITNM="`basename $GITSRC`"
-	GITNM="`echo $GITNM | cut -d \? -f 1`"
-    if [ "x$GITBRCH" != "x" ]
-    then
-        [ ! -e $ABBSTBLPOS/$GITNM ] && git clone -b $GITBRCH $GITSRC $BUILDENV/$GITNM
-    else
-    	[ ! -e $ABBSTBLPOS/$GITNM ] && git clone $GITSRC $BUILDENV/$GITNM
-    fi
-    if [ "x$GITCO" != "x" ]
-    then
-        pushd $BUILDENV/$GITNM
-        git checkout tags/$GITCO
-        popd
-    else
-        true
-    fi
-elif [ "x$SVNSRC" != "x" ]
-then
-	SVNNM="`basename $SVNSRC`"
-	SVNNM="`echo $SVNNM | cut -d \? -f 1`"
-	if [ "xSVNCO" != "x" ]; then
-   	[ ! -e $ABBSTBLPOS/$SVNNM ] && pushd $ABBSTBLPOS; \
-                                       svn co -r $SVNCO --quiet $SVNSRC $SVNNM; \
-                                       popd
-        else
-   	[ ! -e $ABBSTBLPOS/$SVNNM ] && pushd $ABBSTBLPOS; \
-                                       svn co --quiet $SVNSRC $SVNNM; \
-                                       popd
-        fi
-elif [ "x$HGSRC" != "x" ]
-then
-	HGNM="`basename $HGSRC`"
-	HGNM="`echo $HGNM | cut -d \? -f 1`"
-   	[ ! -e $ABBSTBLPOS/$HGNM ] && pushd $ABBSTBLPOS; \
-                                                                    hg clone $HGSRC; \
-                                                                    popd
-elif [ "x$BZRSRC" != "x" ]
-then
-	BZRNM="`basename $BZRSRC`"
-	BZRNM="`echo $BZRNM | cut -d \? -f 1`"
-   	[ ! -e $ABBSTBLPOS/$BZRNM ] && pushd $ABBSTBLPOS; \
-                                                                      bzr branch $BZRSRC; \
-                                                                      popd
+	pushd $ABBSTBLPOS
+	if [ "$GITSRC" ]
+	then
+		git clone $([ "$GITBRCH" ] && echo -b $GITBRCH) $GITSRC -C $ABBSTBLPOS $SRCNM
+		cd $SRCNM
+		[ "$GITCO" ] &&
+			git checkout tags/$GITCO
+	elif [ "$SVNSRC" ]
+	then
+		svn co $([ "$SVNCO" ] && echo -r $SVNCO) --quiet $SVNSRC $SRCNM 
+	elif [ "$HGSRC" ]
+	then
+		hg clone $HGSRC
+	elif [ "$BZRSRC" ]
+	then
+		bzr branch $BZRSRC
+	fi
+	popd # End Sub source_ctrl_getter() <elif-if scoping>
 elif bool $DUMMYSRC
 then
 	mkdir $BUILDENV/dummy
 fi
+# End Sub source_getter()
 
-if [ "x$SUBDIR" = "x" ]
-then
-	[ ! -d $BUILDENV/`ls $BUILDENV` ] && 
+_arg_first(){ echo "$1"; } # auto-lambda: first arg, first file in wildcard
+[ -d "$BUILDENV/${SUBDIR=$(cd "$BUILDENV"; _arg_first *)}" ] ||
 	abdie "Cannot determine the packing subdir."
-	SUBDIR=`ls $BUILDENV`
-fi
+unset _arg_first
 
 echo "Building" >> $BUILDENV/.status
 
 for i in $ABBS/repo/$1/*
 do
-	[ ! -d $i ] && continue
-	rm -rf $BUILDENV/$SUBDIR/autobuild
-	rm -rf $BUILDENV/$SUBDIR/abdist
+	[ -d $i ] || continue
+	rm -rf $BUILDENV/$SUBDIR/{autobuild,abdist}
 	cp -r $i $BUILDENV/$SUBDIR/autobuild
-	if [ "x$VER" != "x" ]
-	then
-		echo "PKGVER=$VER" >> $BUILDENV/$SUBDIR/autobuild/defines
-	fi
-	if [ "x$REL" != "x" ]
-	then
-		echo "PKGREL=$REL" >> $BUILDENV/$SUBDIR/autobuild/defines
-	fi
+	[ "$VER" ] && echo "PKGVER=$VER" >> $BUILDENV/$SUBDIR/autobuild/defines
+	[ "$REL" ] && echo "PKGREL=$REL" >> $BUILDENV/$SUBDIR/autobuild/defines
 	pushd $BUILDENV/$SUBDIR
-	autobuild || abdie "Autobuild returns non-zero value"
+	autobuild || abdie "Autobuild returns non-zero value $?"
 	popd
 done
 

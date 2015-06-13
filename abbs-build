@@ -5,13 +5,24 @@ export ABBS=`cat /etc/abbs/prefix`
 
 for i
 do
-	if echo $i | grep ^groups/ >/dev/null
+	if echo $i | grep -q ^groups/
 	then
 		L="$L `cat $ABBS/repo/$i`"
 	else
+		if echo $i | grep -q /; then
+			:
+		else
+			f=`find $ABBS/repo -maxdepth 2 -name $i`
+			if [ "$f" ]; then
+				:
+			else
+				exit 1
+			fi
+			d=`dirname $f`
+			i=`basename $d`/`basename $f`
+		fi
 		L="$L $i"
 	fi
 done
 
 exec $ABBS/abbs-build-mini $L
-

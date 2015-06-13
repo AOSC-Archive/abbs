@@ -3,10 +3,7 @@
 export ABBS=`cat /etc/abbs/prefix`
 . $ABBS/env/base.sh
 
-LIST="`abbsgenall $*`"
-for i in $LIST
+for i in "$(abbsgenall "$@")"
 do
 	abbs-process $i
 done
-
-
