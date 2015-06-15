@@ -12,7 +12,7 @@ do
 		if echo $i | grep -q /; then
 			:
 		else
-			f=`find $ABBS/repo -maxdepth 2 -name $i`
+			f=`find $ABBS/repo/ -maxdepth 2 -name $i`
 			if [ "$f" ]; then
 				:
 			else
