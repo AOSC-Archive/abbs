@@ -7,21 +7,17 @@ for i
 do
 	if echo $i | grep -q ^groups/
 	then
-		L="$L `cat $ABBS/repo/$i`"
+		L+=" $(cat $ABBS/repo/$i)"
 	else
-		if echo $i | grep -q /; then
-			:
-		else
-			f=`find $ABBS/repo -maxdepth 2 -name $i`
-			if [ "$f" ]; then
-				:
-			else
+		if [[ "$i" != */* ]]; then
+			f="$(find $ABBS/repo/ -maxdepth 2 -name $i)"
+			if [ -z "$f" ]; then
 				exit 1
 			fi
 			d=`dirname $f`
 			i=`basename $d`/`basename $f`
 		fi
-		L="$L $i"
+		L+=" $i"
 	fi
 done
 
