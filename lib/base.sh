@@ -5,11 +5,14 @@ shopt -s expand_aliases extglob
 
 declare -x ABLIBS="|base|" # GLOBAL: ABLIBS='|base[|lib1|lib2]|'
 
+argprint(){ local p; for p; do printf %q\  "$p"; done; }
+readonly true=1 false=0 yes=1 no=0
+
 bool(){
 	case $1 in
 		0|f|F|false|n|N|no) return 1 ;;
 		1|t|T|true|y|Y|yes) return 0 ;;
-		*) return 1 ;;
+		*) return 2;;
 	esac
 }
 
@@ -21,22 +24,11 @@ abreqexe(){
 
 # So ugly...
 
-abloadpm(){
-	. $AB/$ABMPM/lib/pm.sh
-	ABLIBS+="pm|"	
-	echo "Loaded library pm" 1>&2
-}
-
 abloadlib(){
-	if [ "$1" = "pm" ] 
-	then
-		abloadpm
-		return $?
-	fi
 	[ -f $ABBLPREFIX/$1.sh ] || return 1
 	. $ABBLPREFIX/$1.sh
-	ABLIBS+="${ABLIBS}$1|"
-	echo "Loaded library $1" 1>&2
+	ABLIBS+="$1|"
+	abinfo "Loaded library $1" 1>&2
 }
 
 abrequire(){
@@ -53,8 +45,18 @@ ablog(){
 }
 
 returns() { return $*; }
-abcommaprint(){ local cnt; for i; do echo -n "$i"; abmkcomma; done; }
-abmkcomma(){ ((cnt++)) && echo -n "${ABCOMMA- , }"; }
+abcommaprint(){ local cnt; for i; do abmkcomma; echo -n "$i"; done; }
+abmkcomma(){ ((cnt++)) && echo -n "${ABCOMMA-, }"; }
+
+# hey buddy, you are dying!
+abicu(){
+	if ((ABSTRICT)); then
+		shift
+		abdie "$@"
+	else
+		abwarn "$1"
+	fi
+}
 
 abdie() {
 	echo -e "\e[1;31mautobuild encountered an error and couldn't continue.\e[0m" 1>&2
@@ -69,6 +71,7 @@ abdie() {
 }
 
 # Should these information be redirected into ablog()?
+# new ref impl: https://github.com/Arthur2e5/MobileConstructionVehicle/blob/master/common.sh
 abwarn(){ echo -e "[\e[33mWARN\e[0m]: \e[1m$*\e[0m" >&2; }
 aberr(){ echo -e "[\e[31mERROR\e[0m]: \e[1m$*\e[0m" >&2; }
 abinfo(){ echo -e "[\e[96mINFO\e[0m]: \e[1m$*\e[0m" >&2; }
