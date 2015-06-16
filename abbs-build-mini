@@ -3,10 +3,6 @@
 export ABBS=`cat /etc/abbs/prefix`
 . $ABBS/env/base.sh
 
-if [ "$CROSS" ]; then
-	pm_chroot /var/ab/cross-root/$CROSS
-fi
-
 
 for i in "$(abbsgenall "$@")"
 do
