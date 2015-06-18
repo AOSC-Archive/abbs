@@ -1,0 +1,81 @@
+#! /bin/bash
+# TODO: introduce test-more.
+shopt -s expand_aliases extglob
+export PASS=$'\e[32mPASS\e[0m' FAIL=$'\e[31mFAIL\e[0m' TEST=$'\e[33mTEST\e[0m'
+testpass(){ echo "$PASS	$*" >&2; ((pass++));((trys++)); }
+testfail(){ echo "$FAIL	$*" >&2; ((trys++)); }
+argprint(){ printf '%q ' "$@"; }
+# testchk [expected retval=0]
+testchk(){
+	local _ret=$? test="${BASH_LINENO[-1]}	${test=$(argprint "$testprog" "${testargs[@]}")}" testret="${1:-0}"
+	case $_ret in
+		($testret)
+			testpass "$test	$_ret==$testret";;
+		(*)
+			testfail "$test	$_ret!=$testret";;
+	esac
+}
+# testcmd test-cmd[]
+testcmd(){
+	local testprog="$1" testargs testout="$testout" curargs; shift
+	testargs=("$@")
+	# output matching/encoding
+	local IFS=_ _IFS="$IFS"
+	if [ "$testout" ] && [ -e "$testout" ]; then
+	    true 	 # This if true does simplify the code with so many elif.
+	elif [ "$testout" == no ]; then
+		testout= 
+	elif [ -e "$ABBS/unit-test/$testprog_${testargs[*]//[\/ \\]/_}" ]; then
+		testout="$ABBS/unit-test/$testprog_${testargs[*]//[\/ \\]/_}"
+	elif [ -e "$ABBS/unit-test/$testprog" ]; then
+		testout="$ABBS/unit-test/$testprog"
+	fi
+	IFS="$_IFS"
+	if [ "$testout" ]; then
+		"$testprog" "${testargs[@]}" | diff - "$testout"
+	else
+		"$testprog" "${testargs[@]}"
+	fi
+	testchk
+}
+returns(){ return "$1"; }
+testend(){ echo "$TEST	${BASH_SOURCE[-1]}	$pass/$trys" | tee "$TESTLOG" >&2; }
+declare -fx testend testchk testcmd testpass testfail returns argprint
+
+## END LIB
+export TESTLOG="/var/log/abbs-test.log"
+[ -e "$TESTLOG" ] && mv "$TESTLOG"{,_"$(stat --printf %w "$TESTLOG" || date -u +%s || echo $RANDOM)"}
+touch "$TESTLOG"
+[ -e /tmp/abbs-test ] && rm -rf /tmp/abbs-test
+mkdir -p /var/lib/abbs/build
+mkdir /tmp/abbs-test
+cp -r ../* /tmp/abbs-test
+mv /tmp/abbs-test/test/spec /tmp/abbs-test/repo
+if [ -e /etc/abbs/prefix ]
+then
+  mv /etc/abbs/prefix /etc/abbs/real-prefix
+  echo "/tmp/abbs-test" > /etc/abbs/prefix
+fi
+
+export ABBS=/tmp/abbs-test
+export PATH="$ABBS:$PATH"
+export curtest
+
+if [ -z "$1" ]
+then
+  for curtest in /tmp/abbs-test/test/tests/*
+  do
+    echo "$TEST	$curtest" | tee "$TESTLOG" >&2
+    apt-get purge 'abbs-unittest*' --yes &>/dev/null
+    "$curtest"
+    echo | tee "$TESTLOG" >&2
+  done
+else
+  echo "$TEST $1"
+  /tmp/abbs-test/test/tests/*-$1
+fi
+
+if [ -e /etc/abbs/real-prefix ]
+then
+  mv /etc/abbs/real-prefix /etc/abbs/prefix
+fi
