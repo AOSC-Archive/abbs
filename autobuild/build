@@ -1,0 +1,11 @@
+ABBSENV_VARONLY=1 . env/base.sh
+abbs_dirs=( "$SRCDIR"/*/ )
+mkdir -p "$PKGDIR/${ABBS=/usr/lib/abbs}/" "$PKGDIR/${ABBSSET=/etc/abbs}/"
+for f in "${abbs_dirs}"; do
+  cp -al "$f" "$PKGDIR/$ABBS/$f"
+done
+for f in abbs-*; do
+  cp -al "$f" "$PKGDIR/$ABBS/$f"
+  ln -s "$PKGDIR/$ABBS/$f" "$PKGDIR/usr/bin/$f"
+done
+echo "ABBS=$(argprint "$ABBS")" > "$PKGDIR/$ABBSSET/prefix"

@@ -1,0 +1,5 @@
+PKGNAME=abbs
+PKGVER=0.1.$(date -u +%s)
+PKGDES='autobuild build service'
+PKGDEP=autobuild
+PKGSEC=devel
