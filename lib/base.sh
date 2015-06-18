@@ -9,33 +9,42 @@ argprint(){ local p; for p; do printf %q\  "$p"; done; }
 readonly true=1 false=0 yes=1 no=0
 
 bool(){
-	case $1 in
-		0|f|F|false|n|N|no) return 1 ;;
-		1|t|T|true|y|Y|yes) return 0 ;;
+	case "$1" in
+		[0fFnN]|false|no) return 1 ;;
+		[1tTyY]|true|yes) return 0 ;;
 		*) return 2;;
 	esac
 }
 
 abreqexe(){
 	for i; do
-		which $i > /dev/null || abdie "Executable ‘$i’ not found."
+		which $i &> /dev/null || abicu "Executable ‘$i’ not found; returned value: $?."{\ Expect\ failures.,}
 	done
 }
+alias abtryexe='ABSTRICT=0 abreqexe'
 
+abreqcmd(){
+	for i; do
+		(alias; declare -F) | /usr/bin/which -i --read-functions "$i" &> /dev/null ||
+		abicu "Command ‘$i’ not found; returned value: $?."{\ Expect\ failures.,}
+	done
+}
+alias abtrycmd='ABSTRICT=0 abreqcmd'
 # So ugly...
 
 abloadlib(){
-	[ -f $ABBLPREFIX/$1.sh ] || return 1
-	. $ABBLPREFIX/$1.sh
+	[ -f $ABBLPREFIX/$1.sh ] || return 127
+	. $ABBLPREFIX/$1.sh || return $?
 	ABLIBS+="$1|"
 	abinfo "Loaded library $1" 1>&2
 }
 
 abrequire(){
 	for i; do
-		echo $ABLIBS | grep -q "|$i|" || abloadlib $i || abdie "Library ‘$i’ not found."
+		echo $ABLIBS | grep -q "|$i|" || abloadlib $i || abicu "Library ‘$i’ failed to load; returned value: $?."{\ Expect\ failures.,}
 	done
 }
+alias abtrylib='ABSTRICT=0 abrequire'
 
 ablog(){
 	if bool $ABDUMB
@@ -51,10 +60,11 @@ abmkcomma(){ ((cnt++)) && echo -n "${ABCOMMA-, }"; }
 # hey buddy, you are dying!
 abicu(){
 	if ((ABSTRICT)); then
-		shift
+		[ "$2" ] && shift
 		abdie "$@"
 	else
-		abwarn "$1"
+		aberr "$1"
+		return 1
 	fi
 }
 
@@ -97,3 +107,9 @@ aosc_lib(){
 }
 
 aosc_lib base
+
+aosc_lib_skip(){
+	abwarn "${1-$AOSC_SOURCE} loading skipped."
+	return 1
+}
+alias ablibret='aosc_lib_skip $BASH_SOURCE || return 0'
