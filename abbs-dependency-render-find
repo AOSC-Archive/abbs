@@ -18,7 +18,7 @@ function printdep(){
 		done
 	else
 		echo "$2$1"
-		add_if_not_exist "$tmpf" $1
+		grep -q "^$1\$" repo-spec/external-packages || add_if_not_exist "$tmpf" $1
 	fi
 }
 for i
