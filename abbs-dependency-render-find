@@ -1,6 +1,6 @@
 #! /usr/bin/abbl-invoke
 if [ "$REPO" ]; then
-	cd "REPO"
+	cd "$REPO"
 else
 	cd $(cat /etc/abbs/prefix)/repo
 fi
