@@ -18,6 +18,7 @@ function printdep(){
 		done
 	else
 		echo "$2$1"
+		[ "$(sqlite3 abbs.db 'select * from packages where name='"'$1'")" ] && return
 		grep -q "^$1\$" repo-spec/external-packages || add_if_not_exist "$tmpf" $1
 	fi
 }
