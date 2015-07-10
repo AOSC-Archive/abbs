@@ -26,5 +26,6 @@ for i
 do
 	printdep $i
 done
-echo "Null dependencies: $(cat $tmpf)"
+echo Null dependencies:
+cat $tmpf
 rm -f $tmpf
