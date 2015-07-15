@@ -39,7 +39,7 @@ then
 	pushd $ABBSTBLPOS
 	if [ "$GITSRC" ]
 	then
-		git clone $([ "$GITBRCH" ] && echo -b $GITBRCH) $GITSRC -C $ABBSTBLPOS $SRCNM
+		git clone $([ "$GITBRCH" ] && echo -b $GITBRCH) $GITSRC $SRCNM
 		cd $SRCNM
 		[ "$GITCO" ] &&
 			git checkout $GITCO
@@ -48,11 +48,13 @@ then
 		svn co $([ "$SVNCO" ] && echo -r $SVNCO) --quiet $SVNSRC $SRCNM 
 	elif [ "$HGSRC" ]
 	then
-		hg clone $HGSRC
+		hg clone $HGSRC $SRCNM
 	elif [ "$BZRSRC" ]
 	then
-		bzr branch $BZRSRC
+		# SUPPOSED TO WORK, LACKING DOCUMENTATION
+		bzr branch $BZRSRC $SRCNM
 	fi
+	cp -r $ABBSTBLPOS/$SRCNM $BUILDENV
 	popd # End Sub source_ctrl_getter() <elif-if scoping>
 elif bool $DUMMYSRC
 then
