@@ -23,7 +23,7 @@ echo "Preparing" >> $BUILDENV/.status
 SRCNM="$(basename ${SRCTBL-${GITSRC-${SVNSRC-${HGSRC-${BZRSRC-.}}}}} | cut -d \? -f 1)" # suppress non-exist testing by using self.
 if [ "$SRCTBL" ]
 then
-	[ -e $ABBSTBLPOS/$SRCNM ] || wget "$SRCTBL" -O $ABBSTBLPOS/$SRCNM
+	wget -c "$SRCTBL" -O $ABBSTBLPOS/$SRCNM
 	# tar xvf $ABBSTBLPOS/$SRCNM -C $BUILDENV
 	# Adapting abbsuniformextract here.
 	pushd $BUILDENV
