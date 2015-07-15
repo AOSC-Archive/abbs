@@ -42,7 +42,7 @@ then
 		git clone $([ "$GITBRCH" ] && echo -b $GITBRCH) $GITSRC -C $ABBSTBLPOS $SRCNM
 		cd $SRCNM
 		[ "$GITCO" ] &&
-			git checkout tags/$GITCO
+			git checkout $GITCO
 	elif [ "$SVNSRC" ]
 	then
 		svn co $([ "$SVNCO" ] && echo -r $SVNCO) --quiet $SVNSRC $SRCNM 
