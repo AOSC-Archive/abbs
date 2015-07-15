@@ -54,13 +54,14 @@ then
 		# SUPPOSED TO WORK, LACKING DOCUMENTATION
 		bzr branch $BZRSRC $SRCNM
 	fi
-	cp -r $ABBSTBLPOS/$SRCNM $BUILDENV
 	popd # End Sub source_ctrl_getter() <elif-if scoping>
 elif bool $DUMMYSRC
 then
 	mkdir $BUILDENV/dummy
 fi
 # End Sub source_getter()
+
+cp -r $ABBSTBLPOS/$SRCNM $BUILDENV
 
 _arg_first(){ echo "$1"; } # auto-lambda: first arg, first file in wildcard
 [ -d "$BUILDENV/${SUBDIR=$(cd "$BUILDENV"; _arg_first *)}" ] ||
