@@ -5,20 +5,20 @@ export ABBS=`cat /etc/abbs/prefix`
 
 for i
 do
-	if echo $i | grep -q ^groups/
-	then
-		L+=" $(cat $ABBS/repo/$i)"
-	else
-		if [[ "$i" != */* ]]; then
-			f="$(find $ABBS/repo/ -maxdepth 2 -name $i)"
-			if [ -z "$f" ]; then
-				exit 1
-			fi
-			d=`dirname $f`
-			i=`basename $d`/`basename $f`
-		fi
-		L+=" $i"
-	fi
+	case "$i" in
+		(groups/*)
+			L+=" $(<"$ABBS/repo/$i")";;
+		(*/*)
+			L+=" $i"
+		(*)
+			candidate=( "$ABBS/repo/"*/"$i" )
+			[ "$candidate" != "$ABBS/repo/*/$i" ] || abdie "No vaild candidate for $i found."
+			# Now fetch the last two layers of $candidate (=candidate[0])
+			candy_dir="${candidate##*/}"
+			# And do a simple basename to each.
+			L+=" ${candy_dir%*/}${candidate%*/}"
+	esac
 done
 
+# Now that we have found all the packages, go.
 exec $ABBS/abbs-build-mini $L
