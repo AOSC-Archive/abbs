@@ -1,4 +1,7 @@
 #! /bin/bash
+
+set -xv
+
 . $ABBS/env/base.sh
 abbscheckspec $1
 
@@ -29,8 +32,8 @@ then
 	pushd $BUILDENV
 	if bool $SRCNOSUBDIR
 	then
-		mkdir -p tmp 
-		cd tmp
+		mkdir -p 000-build
+		cd 000-build
 	fi
 	$ABBS/libexec/abbsuniformextract $ABBSTBLPOS/$SRCNM
 	popd
