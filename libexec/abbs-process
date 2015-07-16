@@ -1,7 +1,4 @@
 #! /bin/bash
-
-set -xv
-
 . $ABBS/env/base.sh
 abbscheckspec $1
 
