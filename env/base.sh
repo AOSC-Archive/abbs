@@ -1,9 +1,7 @@
-export ABSET=/etc/autobuild
-export AB=`cat $ABSET/prefix`
-export ABBSSET=/etc/abbs
-export ABBS=`cat $ABBSSET/prefix`
-export ABBLPREFIX="$ABBS/lib"
-export PATH="$ABBS/libexec:$PATH"
+: ${ABSET=/etc/autobuild} ${AB=$(<"$ABSET/prefix")}
+: ${ABBSSET=/etc/abbs} ${ABBS=$(<"$ABBSSET/prefix")} ${ABBLPREFIX="$ABBS/lib"}
+PATH="$ABBS/libexec:$PATH"
+export ABSET AB ABBSSET ABBS ABBLPREFIX PATH ABSET
 
 ((ABBSENV_VARONLY)) && return
 # Load the base lib
