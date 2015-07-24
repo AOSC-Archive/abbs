@@ -61,7 +61,12 @@ then
 fi
 # End Sub source_getter()
 
-cp -r $ABBSTBLPOS/$SRCNM $BUILDENV
+if bool $DUMMYSRC
+then
+	abinfo "Dummy source specified."
+else
+	cp -r $ABBSTBLPOS/$SRCNM $BUILDENV
+fi
 
 _arg_first(){ echo "$1"; } # auto-lambda: first arg, first file in wildcard
 [ -d "$BUILDENV/${SUBDIR=$(cd "$BUILDENV"; _arg_first *)}" ] ||
