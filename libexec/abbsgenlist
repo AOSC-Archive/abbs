@@ -18,7 +18,7 @@ do
 	DEP="`abbscalcdep $1`"
 	for j in $DEP
 	do
-		if pm_checkdep $j
+		if pm_exists $j
 		then
 			continue
 		fi
