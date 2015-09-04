@@ -59,11 +59,16 @@ proc search {pkgname} {
 proc version {pkgname grpname} {
 	global prefix
 	set f [open [file join $prefix repo $grpname $pkgname spec]]
-	while {![chan eof $f]} {
-		set line [gets $f]
-		if {[string match VER=* $line]} {
-			return [string range $line 4 end] ;# FIXME: buggy
+	try {
+		while {![chan eof $f]} {
+			set line [gets $f]
+			# don't panic. bash allows me to do so!
+			if {[string match VER=* $line]} {
+				return [string range $line 4 end]
+			}
 		}
+	} finally {
+		close $f
 	}
 }
 
