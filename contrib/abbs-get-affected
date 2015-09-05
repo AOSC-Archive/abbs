@@ -1,0 +1,28 @@
+#! /usr/bin/abbl-invoke
+if [ "$REPO" ]; then
+	cd "$REPO"
+else
+	cd $(cat /etc/abbs/prefix)/repo
+fi
+tmpf=$(mktemp)
+add_if_not_exist(){
+        grep "^$2\$" $1 2>/dev/null 1>&2 || echo $2 >> $1
+}
+
+function deal_affected(){
+	grep "^$1\$" $tmpf 2>/dev/null 1>&2 && return
+	add_if_not_exist $tmpf $1
+	if [ "$(sqlite3 abbs.db 'select depender from dependencies where dependee='"'$1'")" ]; then
+		for i in $(sqlite3 abbs.db 'select depender from dependencies where dependee='"'$1'")
+		do
+			deal_affected $i
+		done
+	fi
+}
+for i
+do
+	deal_affected $i
+done
+echo Affected:
+cat $tmpf
+rm -f $tmpf

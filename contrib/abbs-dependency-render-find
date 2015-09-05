@@ -1,0 +1,31 @@
+#! /usr/bin/abbl-invoke
+if [ "$REPO" ]; then
+	cd "$REPO"
+else
+	cd $(cat /etc/abbs/prefix)/repo
+fi
+tmpf=$(mktemp)
+add_if_not_exist(){
+        grep "^$2\$" $1 2>/dev/null 1>&2 || echo $2 >> $1
+}
+
+function printdep(){
+	if [ "$(sqlite3 abbs.db 'select dependee from dependencies where depender='"'$1'")" ]; then
+		echo "$2$1"
+		for i in $(sqlite3 abbs.db 'select dependee from dependencies where depender='"'$1'")
+		do
+			printdep $i "$2$1->" 
+		done
+	else
+		echo "$2$1"
+		[ "$(sqlite3 abbs.db 'select * from packages where name='"'$1'")" ] && return
+		grep -q "^$1\$" repo-spec/external-packages || add_if_not_exist "$tmpf" $1
+	fi
+}
+for i
+do
+	printdep $i
+done
+echo Null dependencies:
+cat $tmpf
+rm -f $tmpf

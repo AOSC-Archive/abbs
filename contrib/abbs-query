@@ -1,0 +1,127 @@
+#!/usr/bin/env tclsh
+# 
+# abbs-query
+# Written by Ma Kai <crtmike@hotmail.com>
+#
+# query abbs information
+#
+# Error code
+# 1 invalid call
+# 2 no such package found
+
+proc PrintHelp {} {
+	puts "abbs-query, A tool for querying information of the ABBS tree
+Usage: abbs-query COMMAND ARGUMENT
+
+abbs-query search PKG		find where the package is
+abbs-query list GROUP		list all the packages in a group
+abbs-query open-dir PKG		open the corresponding directory
+
+abbs-query is authored by Ma Kai <crtmike@hotmail.com>"
+}
+
+if {[llength $argv] != 2} {
+	PrintHelp
+	exit 1
+}
+
+lassign $argv command arg
+set fprefix [open /etc/abbs/prefix r]
+set prefix [string trim [read $fprefix]]
+close $fprefix
+
+proc fuzzysearch {pkgname} {
+	global prefix
+	set result {}
+	set grpdirs [glob -types d -directory [file join $prefix repo] *]
+	foreach grpd $grpdirs {
+		set pkgs [glob -nocomplain -tails -types d -directory $grpd *]
+		foreach pkg $pkgs {
+			if {[string first $pkgname $pkg] != -1} {
+				lappend result [list [file tail $grpd] $pkg]
+			}
+		}
+	}
+	return $result
+}
+
+proc search {pkgname} {
+	global prefix
+	set grpdirs [glob -types d -directory [file join $prefix repo] *]
+	foreach grpd $grpdirs {
+		set pkgs [glob -nocomplain -tails -types d -directory $grpd *]
+		if {[lsearch $pkgs $pkgname] != -1} {
+			return [file tail $grpd]
+		}
+	}
+}
+
+proc version {pkgname grpname} {
+	global prefix
+	set f [open [file join $prefix repo $grpname $pkgname spec]]
+	try {
+		while {![chan eof $f]} {
+			set line [gets $f]
+			# don't panic. bash allows me to do so!
+			if {[string match VER=* $line]} {
+				return [string range $line 4 end]
+			}
+		}
+	} finally {
+		close $f
+	}
+}
+
+proc CmdSearch {pkgname} {
+	set pkgs [fuzzysearch $pkgname]
+	if {$pkgs != ""} {
+		foreach pair $pkgs {
+			lassign $pair grp pkg
+			puts "$grp/$pkg\t[version $pkg $grp]"
+		}
+	} else {
+		puts "No such package is found in the ABBS tree"
+		exit 2
+	}
+}
+
+proc CmdList {grpname} {
+	global prefix
+	set grpd [file join $prefix repo $grpname]
+	if {![file exists $grpd]} {
+		puts "No such group is found in the ABBS tree"
+		exit 2
+	}
+	foreach pkg [glob -nocomplain -types d -directory $grpd *] {
+		puts "$grpname/[file tail $pkg]\t[version [file tail $pkg] $grpname]"
+	}
+}
+
+proc CmdOpenDir {pkgname} {
+	global prefix
+	set grpname [search $pkgname]
+	if {$grpname == ""} {
+		puts "No such package is found in the ABBS tree"
+		exit 2
+	}
+	exec xdg-open $prefix/repo/$grpname/$pkgname &
+}
+
+# use switch to avoid magic
+# dispatcher
+switch -nocase -- $command {
+	"search" {
+		CmdSearch $arg
+	}
+	"list" {
+		CmdList $arg
+	}
+	"open-dir" {
+		CmdOpenDir $arg
+	}
+	default {
+		puts "No such command found"
+		PrintHelp
+		exit 1
+	}
+}

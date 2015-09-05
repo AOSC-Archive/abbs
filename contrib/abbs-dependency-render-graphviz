@@ -1,0 +1,44 @@
+#! /usr/bin/abbl-invoke
+if [ "$2" ]; then
+	if [ "$(echo $2 | cut -c 1)" = "/" ]; then
+		out=$2
+	else
+		out=$PWD/$2
+	fi
+else
+	unset out
+fi
+if [ "$REPO" ]; then
+	cd "$REPO"
+else
+	cd $(cat /etc/abbs/prefix)/repo
+fi
+tmpf=$(mktemp)
+add_if_not_exist(){
+        grep "^$2\$" $1 2>/dev/null 1>&2 || echo $2 >> $1
+}
+
+function deal_package(){
+	grep "^$1\$" $tmpf 2>/dev/null 1>&2 && return
+	add_if_not_exist $tmpf $1
+	if [ "$(sqlite3 abbs.db 'select dependee from dependencies where depender='"'$1'")" ]; then
+		for i in $(sqlite3 abbs.db 'select dependee from dependencies where depender='"'$1'")
+		do
+			echo "\"$1\"->\"$i\";"
+			deal_package $i
+		done
+	fi
+}
+function main(){
+	echo 'digraph{'
+	deal_package $1
+	echo '}'
+}
+
+if [ "$out" ]; then
+	main $1 | dot -T svg -o $out
+else
+	main $1
+fi
+
+rm -f $tmpf
