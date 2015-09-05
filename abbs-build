@@ -1,6 +1,12 @@
 #! /bin/bash
+if [ -z ${ABBS} ]; then
+	if [ -f /etc/abbs/prefix ]; then
+		export ABBS=$(cat /etc/abbs/prefix)
+	else
+		export ABBS=${PWD}
+	fi
+fi
 
-export ABBS=`cat /etc/abbs/prefix`
 . $ABBS/env/base.sh
 
 for i in ${@}
@@ -24,4 +30,12 @@ do
 done
 
 # Now that we have found all the packages, go.
-exec $ABBS/abbs-build-mini $L
+
+#for i in ${L}; do
+#	abbs-process $i
+#done
+
+for i in $(abbsgenall "$@")
+do
+        abbs-process $i
+done
