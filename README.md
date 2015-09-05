@@ -23,7 +23,7 @@ The following new members are also added to a repo:
 * `groups/*` are text files consisting of packages to build in groups. The pkgs
   can be deliminated by any characters in the bash `$IFS`, that is, a space, a
   newline and a tab. The contents of it will be directly passed to
-  `abbs-build-mini`, which means that nesting is not available.
+  `abbs-process`.
 * `repo-spec/` is the directory for storing weird repo specifications. Don't
   ask me why it is not something like `.abbs-repo`.
   * `external-packages` defines the list of packages that should be searched
@@ -45,8 +45,8 @@ Building
 
 The `abbs-build` is the main tool for building. It accepts all implemented abbs
 pkgname types. After expanding the names to **In-repo Names** (note this will
-change soon), it passes the resulting list as the args of `abbs-build-mini`, 
-which runs `abbs-process` on each output of `abbsgenall "$@"`.
+change soon), it passes the resulting list as the args of `abbs-process` on each
+output of `abbsgenall "$@"`.
 
 The `abbsgenall` scriptlet does the recurse-print-sort-dedup job.
 
