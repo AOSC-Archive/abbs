@@ -22,7 +22,7 @@ do
 		then
 			continue
 		fi
-		if pm_repoinstall $j >/dev/tty </dev/tty
+		if pm_repoinstall $DEP >/dev/tty </dev/tty
 		then
 			continue
 		fi
