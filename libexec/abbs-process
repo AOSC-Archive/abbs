@@ -1,90 +1,84 @@
 #! /bin/bash
-. $ABBS/env/base.sh
-abbscheckspec $1
+. ${ABBS}/env/base.sh
+
+abbs_check_dummy() {
+        if bool ${SRCNOSUBDIR}
+        then
+                mkdir -p 000-build
+                cd 000-build
+        fi
+}
+
+abbscheckspec ${1}
 
 abrequire pm
 
 ABDEP="`abbscalcdep $1`"
-pm_exists $ABDEP || abdie "Dependencies are not satisfied for $1"
+pm_exists ${ABDEP} || abdie "Dependencies are not satisfied for $1"
 
-. $ABBS/repo/$1/spec
+. ${ABBS}/repo/${1}/spec
 
-SPECSEC=`dirname $1`
-SPECNAM=`basename $1`
+SPECSEC=`dirname ${1}`
+SPECNAM=`basename ${1}`
 
 BUILDENV="`abbsallocenv $SPECSEC-$SPECNAM`"
 
-echo "Preparing" >> $BUILDENV/.status
+echo "Preparing" >> ${BUILDENV}/.status
 
-# auto-routine-matcher: share popd and pushd, merge tempvars
-# lint-warning: suggesting double-quoting
-# human-guess: `[ -e TARGET/MARK ] || pushd` may cause problems, guessing meaning.
-# Sub source_getter() <fileio>
 SRCNM="$(basename ${SRCTBL-${GITSRC-${SVNSRC-${HGSRC-${BZRSRC-.}}}}} | cut -d \? -f 1)" # suppress non-exist testing by using self.
 if [ "$SRCTBL" ]
 then
-	wget -c "$SRCTBL" -O $ABBSTBLPOS/$SRCNM
+	wget -c "$SRCTBL" -O ${ABBSTBLPOS}/${SRCNM}
 	# tar xvf $ABBSTBLPOS/$SRCNM -C $BUILDENV
 	# Adapting abbsuniformextract here.
-	pushd $BUILDENV
-	if bool $SRCNOSUBDIR
-	then
-		mkdir -p 000-build
-		cd 000-build
-	fi
-	$ABBS/libexec/abbsuniformextract $ABBSTBLPOS/$SRCNM
-	popd
-elif [ ! -e $ABBSTBLPOS/$SRCNM ] # Sub source_ctrl_getter() <misaka_generated_goto_alt>
+	pushd ${BUILDENV} > /dev/null
+	abbs_check_dummy
+	${ABBS}/libexec/abbsuniformextract ${ABBSTBLPOS}/${SRCNM}
+	popd > /dev/null
+elif [ ! -e ${ABBSTBLPOS}/${SRCNM} ]
 then
-	pushd $ABBSTBLPOS
+	pushd ${ABBSTBLPOS} > /dev/null
 	if [ "$GITSRC" ]
 	then
-		git clone $([ "$GITBRCH" ] && echo -b $GITBRCH) $GITSRC $SRCNM
-		cd $SRCNM
+		git clone $([ "$GITBRCH" ] && echo -b ${GITBRCH}) ${GITSRC} ${SRCNM}
+		cd ${SRCNM}
 		[ "$GITCO" ] &&
-			git checkout $GITCO
+			git checkout ${GITCO}
 	elif [ "$SVNSRC" ]
 	then
-		svn co $([ "$SVNCO" ] && echo -r $SVNCO) --quiet $SVNSRC $SRCNM 
+		svn co $([ "$SVNCO" ] && echo -r ${SVNCO}) --quiet ${SVNSRC} ${SRCNM}
 	elif [ "$HGSRC" ]
 	then
-		hg clone $HGSRC $SRCNM
+		hg clone ${HGSRC} ${SRCNM}
 	elif [ "$BZRSRC" ]
 	then
 		# SUPPOSED TO WORK, LACKING DOCUMENTATION
-		bzr branch $BZRSRC $SRCNM
+		bzr branch ${BZRSRC} ${SRCNM}
 	fi
-	popd # End Sub source_ctrl_getter() <elif-if scoping>
-elif bool $DUMMYSRC
-then
-	mkdir $BUILDENV/dummy
-fi
-# End Sub source_getter()
-
-if bool $DUMMYSRC
+	popd > /dev/null
+elif bool ${DUMMYSRC}
 then
 	abinfo "Dummy source specified."
-else
-	cp -r $ABBSTBLPOS/$SRCNM $BUILDENV
+	mkdir ${BUILDENV}/dummy
 fi
 
-_arg_first(){ echo "$1"; } # auto-lambda: first arg, first file in wildcard
+_arg_first(){ echo "$1"; }
 [ -d "$BUILDENV/${SUBDIR=$(cd "$BUILDENV"; _arg_first *)}" ] ||
 	abdie "Cannot determine the packing subdir."
 unset _arg_first
 
-echo "Building" >> $BUILDENV/.status
+echo "Building" >> ${BUILDENV}/.status
 
-for i in $ABBS/repo/$1/*
+for i in ${ABBS}/repo/${1}/*
 do
-	[ -d $i ] || continue
-	rm -rf $BUILDENV/$SUBDIR/{autobuild,abdist}
-	cp -r $i $BUILDENV/$SUBDIR/autobuild
-	[ "$VER" ] && echo "PKGVER=$VER" >> $BUILDENV/$SUBDIR/autobuild/defines
-	[ "$REL" ] && echo "PKGREL=$REL" >> $BUILDENV/$SUBDIR/autobuild/defines
-	pushd $BUILDENV/$SUBDIR
+	[ -d ${i} ] || continue
+	rm -rf ${BUILDENV}/${SUBDIR}/{autobuild,abdist}
+	cp -r ${i} ${BUILDENV}/${SUBDIR}/autobuild
+	[ "$VER" ] && echo "PKGVER=$VER" >> ${BUILDENV}/${SUBDIR}/autobuild/defines
+	[ "$REL" ] && echo "PKGREL=$REL" >> ${BUILDENV}/${SUBDIR}/autobuild/defines
+	pushd ${BUILDENV}/${SUBDIR} > /dev/null
 	autobuild || abdie "Autobuild returns non-zero value $?"
-	popd
+	popd > /dev/null
 done
 
-echo "Success" > $BUILDENV/.status
+echo "Success" > ${BUILDENV}/.status
