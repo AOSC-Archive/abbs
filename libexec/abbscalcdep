@@ -1,19 +1,12 @@
 #! /bin/bash
 . $ABBS/env/base.sh
-TMPF1="`abbstmpf`"
-TMPF2="`abbstmpf`"
 abbscheckspec $1
 for i in $ABBS/repo/$1/*
 do
 	[ ! -d "$i" ] && continue
 	. $i/defines
-	for j in $PKGDEP
-	do
-		echo $j >> $TMPF1
-	done
-	cat $TMPF1 | sort | uniq > $TMPF2
-	cat $TMPF2 > $TMPF1
+	RESOLV+=" $(echo $PKGDEP $BUILDDEP) "
 done
-RES="`cat $TMPF1`"
+RES="$(for i in ${RESOLV}; do echo $i; done | sort -u)"
+
 echo $RES
-rm -f $TMPF1 $TMPF2
