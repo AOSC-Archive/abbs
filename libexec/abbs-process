@@ -58,8 +58,14 @@ then
 	popd > /dev/null
 elif bool ${DUMMYSRC}
 then
-	abinfo "Dummy source specified."
 	mkdir ${BUILDENV}/dummy
+fi
+
+if bool ${DUMMYSRC}
+then
+	abinfo "Dummy source specified."
+else
+	cp -r ${ABBSTBLPOS}/${SRCNM} ${BUILDENV}
 fi
 
 _arg_first(){ echo "$1"; }
