@@ -75,6 +75,7 @@ unset _arg_first
 
 echo "Building" >> ${BUILDENV}/.status
 
+bs_proc_die(){ abdie "$@" 2>&1 | tee -a ${BUILDENV}/.status >&2; }
 for i in ${ABBS}/repo/${1}/*
 do
 	[ -d ${i} ] || continue
@@ -83,7 +84,7 @@ do
 	[ "$VER" ] && echo "PKGVER=$VER" >> ${BUILDENV}/${SUBDIR}/autobuild/defines
 	[ "$REL" ] && echo "PKGREL=$REL" >> ${BUILDENV}/${SUBDIR}/autobuild/defines
 	pushd ${BUILDENV}/${SUBDIR} > /dev/null
-	autobuild || abdie "Autobuild returns non-zero value $?"
+	autobuild || bs_proc_die "Autobuild returns non-zero value $?"
 	popd > /dev/null
 done
 
