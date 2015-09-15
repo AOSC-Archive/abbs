@@ -6,36 +6,34 @@ if [ -z ${ABBS} ]; then
 		export ABBS=${PWD}
 	fi
 fi
-
+L=()
 . $ABBS/env/base.sh
 
-for i in ${@}
+type _abbs_build_procfail_handle || _abbs_build_procfail_handle(){ exit $?; }
+
+for i
 do
 	case "$i" in
 		groups\/* )
-			L+=" $(<"$ABBS/repo/$i")"
+			L+=("$(<"$ABBS/repo/$i")")
 			;;
 		*\/* )
-			L+=" $i"
+			L+=("$i")
 			;;
 # FIXME: wrong IFS handling.
-#		* )
+#		*)
 #			candidate=( "$ABBS/repo/"*/"$i" )
 #			[ "$candidate" != "$ABBS/repo/*/$i" ] || abdie "No vaild candidate for $i found."
 #			# Now fetch the last two layers of $candidate (=candidate[0])
 #			IFS=/ p=($candidate)
-#			L+=" ${p[-2]}/${p[-1]}"
+#			L+=("${p[-2]}/${p[-1]}")
 #			;;
 	esac
 done
 
 # Now that we have found all the packages, go.
 
-#for i in ${L}; do
-#	abbs-process $i
-#done
-
-for i in $(abbsgenall "$@")
+for i in $(abbsgenall "${L[@]}")
 do
-        abbs-process $i
+        abbs-process "$i" || _abbs_build_procfail_handle
 done
