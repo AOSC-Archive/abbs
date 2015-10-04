@@ -9,7 +9,8 @@ fi
 L=()
 . $ABBS/env/base.sh
 
-type _abbs_build_procfail_handle || _abbs_build_procfail_handle(){ exit $?; }
+type _abbs_build_procfail_handle 2>/dev/null ||
+	_abbs_build_procfail_handle(){ exit; }
 
 for i
 do
