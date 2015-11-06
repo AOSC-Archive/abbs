@@ -1,11 +1,13 @@
 #!/bin/bash
+##base.sh: Base library.
+##@copyright GPL-2.0+ WITH GPL-Classpath-Exception
 # Not to be run directly.
 # TODO:	Add basic support for bashdb.
 shopt -s expand_aliases extglob
 
 declare -x ABLIBS="|base|" # GLOBAL: ABLIBS='|base[|lib1|lib2]|'
 
-argprint(){ local p; for p; do printf %q\  "$p"; done; }
+argprint(){ printf '%q ' "$@"; }
 readonly true=1 false=0 yes=1 no=0
 
 bool(){
@@ -17,20 +19,30 @@ bool(){
 }
 
 abreqexe(){
+	local i;
 	for i; do
 		which $i &> /dev/null || abicu "Executable ‘$i’ not found; returned value: $?."{\ Expect\ failures.,}
 	done
 }
 alias abtryexe='ABSTRICT=0 abreqexe'
 
+_whichcmd(){ (alias; declare -f) | /usr/bin/which -i --read-functions "$1"; }
+which --version 2>/dev/null | grep -q GNU || _whichcmd(){ alias "$1" || declare -f "$1" || which "$1"; }
 abreqcmd(){
+	local i;
 	for i; do
-		(alias; declare -F) | /usr/bin/which -i --read-functions "$i" &> /dev/null ||
+		type "$i" &> /dev/null ||
 		abicu "Command ‘$i’ not found; returned value: $?."{\ Expect\ failures.,}
 	done
 }
 alias abtrycmd='ABSTRICT=0 abreqcmd'
-# So ugly...
+
+abcmdstub(){
+	local i;
+	for i; do
+		_whichcmd "$i" &>/dev/null || alias "$i=${_ab_stub_body:-:}"
+	done
+}
 
 abloadlib(){
 	[ -f $ABBLPREFIX/$1.sh ] || return 127
@@ -40,8 +52,10 @@ abloadlib(){
 }
 
 abrequire(){
+	local i
 	for i; do
-		echo $ABLIBS | grep -q "|$i|" || abloadlib $i || abicu "Library ‘$i’ failed to load; returned value: $?."{\ Expect\ failures.,}
+		[[ $ABLIBS == *"|$i|"* ]] || abloadlib "$i" ||
+		abicu "Library ‘$i’ failed to load; returned value: $?."{" Expect Failures",}
 	done
 }
 alias abtrylib='ABSTRICT=0 abrequire'
@@ -88,13 +102,12 @@ abinfo(){ echo -e "[\e[96mINFO\e[0m]: \e[1m$*\e[0m" >&2; }
 abdbg(){ echo -e "[\e[32mDEBUG\e[0m]:\e[1m$*\e[0m" >&2; }
 ab_dbg(){ local _ret=$?; [ $AB_DBG ] && abdbg "$@"; return $_ret; }
 recsr(){ for sr in "$@"; do . $sr; done }
-argprint(){ local arg; for arg; do printf "%q " "$i"; done; }
 # Special Source, looks like stacktrace
 .(){
 	ab_dbg "Sourcing from $1:"
 	source "$@"
 	local _ret=$? # CATCH_TRANSPARENT
-	returns $_ret || abwarn ". $(argprint "$@") returned $_ret".
+	returns $_ret || abwarn ". $(argprint "$@")returned $_ret".
 	ab_dbg "End Of $1."
 	return $_ret
 }
@@ -113,3 +126,61 @@ aosc_lib_skip(){
 	return 1
 }
 alias ablibret='aosc_lib_skip $BASH_SOURCE || return 0'
+
+# shopt/set control
+# Name-encoding: Regular shopts should just use their regular names,
+# and setflags use '-o xxx' as the name.
+declare -A opt_memory
+# set_opt opt-to-set
+set_opt(){
+	[ "$1" ] || return 2
+	if ! shopt -q $1; then
+		shopt -s $1 && # natural validation
+		opt_memory["$1"]=0
+	fi
+}
+# rec_opt [opts-to-recover ...]
+rec_opt(){
+	local _opt
+	if [ -z "$1" ]; then
+		rec_opt "${!opt_memory[@]}"
+	elif [ "$1" == '-o' ]; then
+		rec_opt "${!opt_memory[@]/#!(-o*)/_skip}"
+	elif [ "$1" == '+o' ]; then
+		rec_opt "${!opt_memory[@]/#-o*/_skip}"
+	else
+		for _opt; do
+			[ "$_opt" == _skip ] && continue
+			case "${opt_memory[$_opt]}" in
+				(0)	uns_opt "$_opt";;
+				(1)	set_opt "$_opt";;
+				(*)	abwarn "Invaild memory $_opt: '${opt_memory[$_opt]}'"; unset opt_memory["$_opt"];;
+			esac
+		done
+	fi
+}
+# uns_opt opt-to-unset
+uns_opt(){
+	[ "$1" ] || return 2
+	if shopt -q $1; then
+		shopt -s $1 && # natural validation
+		opt_memory["$1"]=1
+	fi
+}
+
+# USEOPT/NOOPT control
+boolopt(){
+	local t="$1"
+	declare -n n u
+	t="${f##NO_}"
+	u="USE$t" n="NO$t"
+	if ((n)); then
+		return 1
+	elif ((u)); then
+		return 0
+	elif [[ "$t" == NO_* ]]; then
+		return 1
+	else
+		return 0
+	fi
+}
