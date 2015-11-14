@@ -25,7 +25,7 @@ BUILDENV="`abbsallocenv $SPECSEC-$SPECNAM`"
 
 echo "Preparing" >> ${BUILDENV}/.status
 
-SRCNM="$(basename ${SRCTBL-${GITSRC-${SVNSRC-${HGSRC-${BZRSRC-.}}}}} | cut -d \? -f 1)" # suppress non-exist testing by using self.
+SRCNM="$(basename ${SRCTBL-${GITSRC-${SVNSRC-${HGSRC-${BZRSRC-.}}}}} | cut -d \? -f 1 | cut -d: -f2-)"
 if [ "$SRCTBL" ]
 then
 	wget -c "$SRCTBL" -O ${ABBSTBLPOS}/${SRCNM}
@@ -53,7 +53,10 @@ then
 	elif [ "$BZRSRC" ]
 	then
 		# SUPPOSED TO WORK, LACKING DOCUMENTATION
-		bzr branch ${BZRSRC} ${SRCNM}
+		bzr branch ${BZRSRC}
+		cd ${SRCNM}
+		[ "$BZRCO" ] &&
+                        bzr update -r${BZRCO}
 	fi
 	popd > /dev/null
 elif bool ${DUMMYSRC}
