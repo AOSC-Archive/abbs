@@ -34,7 +34,8 @@ done
 
 # Now that we have found all the packages, go.
 
-for i in $(abbsgenall ${L[@]})
+for i in ${L[@]}
 do
+	abbsgenall "$i"
         abbs-process "$i" || _abbs_build_procfail_handle
 done
