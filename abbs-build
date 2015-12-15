@@ -16,7 +16,7 @@ for i
 do
 	case "$i" in
 		groups\/* )
-			L+=("$(<"$ABBS/repo/$i")")
+			L+="$(<"$ABBS/repo/$i")"
 			;;
 		*\/* )
 			L+=("$i")
@@ -34,7 +34,7 @@ done
 
 # Now that we have found all the packages, go.
 
-for i in $(abbsgenall "${L[@]}")
+for i in $(abbsgenall ${L[@]})
 do
         abbs-process "$i" || _abbs_build_procfail_handle
 done
