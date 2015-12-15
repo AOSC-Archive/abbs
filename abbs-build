@@ -16,7 +16,7 @@ for i
 do
 	case "$i" in
 		groups\/* )
-			L+="$(<"$ABBS/repo/$i")"
+			L+=($(<"$ABBS/repo/$i"))
 			;;
 		*\/* )
 			L+=("$i")
@@ -26,14 +26,14 @@ do
 			[ "$candidate" != "$ABBS/repo/*/$i" ] || abdie "No vaild candidate for $i found."
 			# Now fetch the last two layers of $candidate (=candidate[0])
 			IFS=/ p=($candidate)
-			IFS= L+="${p[-2]}/${p[-1]}"
+			IFS= L+=("${p[-2]}/${p[-1]}")
 			;;
 	esac
 done
 
 # Now that we have found all the packages, go.
 
-for i in ${L[@]}
+for i in "${L[@]}"
 do
 	abbsgenall "$i"
         abbs-process "$i" || _abbs_build_procfail_handle
