@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 . $ABBS/env/base.sh
 abbscheckspec $1
 
@@ -13,7 +13,7 @@ add_if_not_exist(){
 }
 
 TMPF="`abbstmpf`"
-for i in $1
+for i 
 do
 	DEP="`abbscalcdep $1`"
 	for j in $DEP

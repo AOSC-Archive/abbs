@@ -36,6 +36,6 @@ done
 
 for i in "${L[@]}"
 do
-	abbsgenall "$i"
+	abbsgenall "$i" &&
         abbs-process "$i" || _abbs_build_procfail_handle
 done
