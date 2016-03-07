@@ -1,0 +1,15 @@
+#! /bin/bash
+##@return __var{abbs_set} abbs_deps
+abbscalcdep(){
+	abbscheckspec "$1"
+	abbs_set abbs_deps
+	local i names=()
+	for i in "$ABBS/repo/$1"/*
+	do
+		[ -d "$i" ] || continue
+		. "$i"/defines
+		names+=("$PKGNAME")
+		abbs_set_add abbs_deps $PKGDEP $BUILDDEP
+	done
+	abbs_set_del abbs_deps "${names[@]}"
+}
