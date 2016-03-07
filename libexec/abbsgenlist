@@ -2,7 +2,7 @@
 . $ABBS/env/base.sh
 abbscheckspec $1
 
-abrequire pm
+abrequire pm arch
 
 if [ "$CROSS" ]; then
 	pm_chroot /var/ab/cross-root/$CROSS
