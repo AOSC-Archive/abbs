@@ -5,11 +5,12 @@ for i in $ABBS/repo/$1/*
 do
 	[ ! -d "$i" ] && continue
 	. $i/defines
-	. $i/defines
-	[[ grep "$PKGNAME" <<< "$PKGDEP" || grep "$PKGNAME" <<< "$BUILDDEP" ]] && \
-	abinfo "Omitting in-tree sub-package dependency..."
-	RESOLV+=" $(echo ${PKGDEP/$PKGNAME/} ${BUILDDEP/$PKGNAME/}) "
+	NAMECACHE+=($(echo $PKGNAME))
+	RESOLV+=" ${PKGDEP} ${BUILDDEP} "
+done
+for i in "${NAMECACHE[@]}"; do
+	abinfo "Omitting in-tree dependency $i ..."
+	RESOLV="${RESOLV//$i}"
 done
 RES="$(for i in ${RESOLV}; do echo $i; done | sort -u)"
-
-echo $RES
+echo "${RES}"

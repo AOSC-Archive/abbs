@@ -13,8 +13,8 @@ abbscheckspec ${1}
 
 abrequire pm
 
-ABDEP="`abbscalcdep $1`"
-pm_exists ${ABDEP} || abdie "Dependencies are not satisfied for $1"
+#ABDEP="`abbscalcdep $1`"
+#pm_exists ${ABDEP} || abdie "Dependencies are not satisfied for $1"
 
 . ${ABBS}/repo/${1}/spec
 
