@@ -13,7 +13,7 @@ add_if_not_exist(){
 }
 
 TMPF="`abbstmpf`"
-for i 
+for i
 do
 	DEP="`abbscalcdep $1`"
 	for j in $DEP
