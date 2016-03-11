@@ -1,4 +1,12 @@
-#! /bin/bash
+#!/bin/bash
+# subname => fully-qualified-name
+abbs_findname(){
+	for
+}
+# name => fully-qualified-name
+abbs_fullname(){
+	
+}
 . $ABBS/env/base.sh
 for i in $ABBS/repo/*/*/*
 do
