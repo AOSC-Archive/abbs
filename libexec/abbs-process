@@ -81,7 +81,7 @@ if [ "$SUBDIR" = "" ]; then
 	done
 fi
 
-[ "$SUBDIR" = ""] && abdie "Cannot determine the packing subdir."
+[ "$SUBDIR" = "" ] && abdie "Cannot determine the packing subdir."
 
 echo "Building" >> ${BUILDENV}/.status
 
