@@ -71,15 +71,10 @@ else
 	cp -r ${ABBSTBLPOS}/${SRCNM} ${BUILDENV}
 fi
 
-if [ "$SUBDIR" = "" ]; then
-	for i in $(cd "$BUILDENV"; ls)
-	do
-	if [ -d "$BUILDENV/$i" ]; then
-		SUBDIR="$i"
-		break
-	fi
-	done
-fi
+_arg_first(){ printf '%s' "$1"; }
+[ -d "$BUILDENV/${SUBDIR=$(cd "$BUILDENV"; _arg_first */)}" ] ||
+	abdie "Cannot determine the packing subdir."
+unset -f _arg_first
 
 [ "$SUBDIR" = "" ] && abdie "Cannot determine the packing subdir."
 
