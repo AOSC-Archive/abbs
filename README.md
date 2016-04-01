@@ -1,5 +1,5 @@
-AutoBuild Build Servicem (ABBS)
-===============================
+AutoBuild Build Service (AB*BS* )
+=================================
 
 ABBS, or AutoBuild Build Service is an upper structure of Autobuild3, intended to provide a way to maintain Autobuild configurations/mainfests in a tree-like manner.
 
