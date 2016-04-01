@@ -8,7 +8,6 @@ export ABSET AB ABBSSET ABBS ABBLPREFIX PATH ABSET
 . "$AB"/lib/base.sh
 # HACK!
 . "$ABBS"/lib/abbs.sh && ABLIBS+='abbs|'
-abrequire set
 
 recsr $ABBS/etc/abbs/*
 
