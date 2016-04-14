@@ -9,6 +9,7 @@ export ABSET AB ABBSSET ABBS ABBLPREFIX PATH ABSET
 # HACK!
 . "$ABBS"/lib/abbs.sh && ABLIBS+='abbs|'
 
-recsr $ABBS/etc/abbs/*
+recsr "$ABBS"/etc/abbs/*
+. "$AB"/etc/autobuild/ab3_defcfg.sh
 
 export $(cat $ABBS/params/*)
