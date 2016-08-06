@@ -4,8 +4,8 @@ abbscheckspec $1
 
 abrequire pm arch
 
-if [ "$CROSS" != "$ARCH" ]; then
-	pm_chroot /var/ab/cross-root/"$CROSS"
+if [ "$CROSS" ]; then
+	pm_chroot /var/ab/cross-root/$CROSS
 fi
 
 add_if_not_exist(){
