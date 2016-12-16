@@ -7,6 +7,7 @@ abbs_findname(){
 abbs_fullname(){
 	
 }
+
 . $ABBS/env/base.sh
 for i in $ABBS/repo/*/*/*
 do

@@ -1,21 +1,5 @@
-#! /bin/bash
-. $ABBS/env/base.sh
-abbscheckspec $1
-
-abrequire pm
-
-add_if_not_exist(){
-	grep -q "^$2\$" $1 || echo $2 >> $1
+#!/bin/bash
+# gen-list already does `for i
+abbs_gen_all(){
+	abbs_gen_list "$@"
 }
-
-TMPF="$(abbstmpf)"
-for i
-do
-	RES="$(abbsgenlist $i)" || abdie "abbsgenlist returned non-zero value."
-	for j in $RES
-	do
-		add_if_not_exist $TMPF $j
-	done
-done
-cat "$TMPF"
-rm -f "$TMPF"

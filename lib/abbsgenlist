@@ -1,6 +1,5 @@
 #!/bin/bash
 . $ABBS/env/base.sh
-abbscheckspec $1
 
 abrequire pm arch
 
@@ -15,6 +14,7 @@ add_if_not_exist(){
 TMPF="`abbstmpf`"
 for i
 do
+	abbscheckspec "$i"
 	DEP="`abbscalcdep $1`"
 	for j in $DEP
 	do
