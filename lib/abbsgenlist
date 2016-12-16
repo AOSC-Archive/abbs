@@ -7,52 +7,75 @@ if [ ! "$CROSS" = "" ] && [ "$CROSS" != "$ARCH" ]; then
 	pm_chroot /var/ab/cross-root/"$CROSS"
 fi
 
-add_if_not_exist(){
-	grep "^$2\$" $1 2>/dev/null 1>&2 || echo $2 >> $1
+##abbs_deps _FULLY_QUALIFIED_NAME_
+##@return{abset} abbs_deps: Shallow dependencies in "entirely qualified names"
+##                          (i.e. abstraction leak for sub-builds; FIXME)
+abbs_deps(){
+	((__abbs_gen_list_recurse__)) || abset_loc deps # warning?
+	abset_new abbs_deps
+	local __abbs_gen_list_recurse__=1
+	local i
+
+	local PKGDEP BUILDDEP # TODO: local all defines
+	# Process [num]-* too -- this sounds silly but that's how it works
+	for i in "$ABBS/repo/$1"/*/
+	do
+		# cycle detection
+		if [[ ${deps["$i"]} == VISITED ]]; then
+			abinfo "$i already expanded. Cycle?"
+			continue
+		fi
+		deps["$i"]='VISITED'
+
+		[ -d "$i" ] || continue
+		. "$i"/defines
+		# names+=("$PKGNAME")
+		abset_add abbs_deps $PKGDEP $BUILDDEP # split; deprecate@ab3-2.x
+	done
+	# abset_del abbs_deps "${names[@]}"
 }
 
-TMPF="`abbstmpf`"
-for i
-do
-	abbscheckspec "$i"
-	DEP="`abbscalcdep $1`"
-	for j in $DEP
-	do
-		if pm_exists $j
+# input is fully qualified name?
+abbs_gen_list(){
+	# make sure we don't curse over and over
+	if ((!__abbs_gen_list_recurse__)); then
+		abset_loc deps
+		local __abbs_gen_list_top__=1
+	fi
+	abset_loc current_level_deps
+	local __abbs_gen_list_recurse__=1
+
+	abbs_deps "$@"
+	abset_add deps "${!abbs_deps[@]}"
+
+	# move the returned set to a local set
+	abset_add current_level_deps "${!abbs_deps[@]}"
+	unset abbs_deps
+
+	local j
+	for j in "${!current_level_deps[@]}"; do
+		if pm_exists "$j"
 		then
 			continue
 		fi
-		if pm_repoinstall $DEP >/dev/tty </dev/tty
+		if pm_repoinstall "$DEP" >/dev/tty </dev/tty
 		then
 			continue
 		fi
-		SOURCE="`abbsfindsource $j`"
-		if [ "x$SOURCE" = "x" ]
-		then
-			if [ "x$2" = "xr" ]
-			then
-				echo "Cannot find the specification for package $j"
-				exit 1
-			fi
-			abdie "Cannot find the specification for package $j"
+
+		# check for build
+		SOURCE="`abbsfindsource "$j"`"
+		if (($?)) || [[ ! -n $SOURCE ]]; then
+			aberr "Cannot find build spec for package $j"
+			return 1
+		else
+			# redo the curse
+			__abbs_gen_list_top__=0 abbs_gen_list "$j" || return
 		fi
-		SUBLIST="`abbsgenlist $SOURCE r`"
-		if echo $SUBLIST | grep "^Cannot find the" >/dev/null 2>&1
-		then
-			if [ "x$2" = "xr" ]
-			then
-				echo "$SUBLIST"
-				exit 1
-			fi
-			abdie "Sub abbsgenlist returned non-zero. Error infomation: $SUBLIST"
-		fi
-		for k in $SUBLIST
-		do
-			add_if_not_exist $TMPF $k
-		done
 	done
-	add_if_not_exist $TMPF $1
-done
-LIST="`cat $TMPF`"
-rm -f $TMPF
-echo $LIST
+
+	# transitional pipable return
+	if ((__abbs_gen_list_top__)); then
+		printf '%s\n' "${!deps[@]}"
+	fi
+}

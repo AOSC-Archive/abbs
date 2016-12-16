@@ -1,17 +1,1 @@
 #! /bin/bash
-##abbs_deps _FULLY_QUALIFIED_NAME_
-##@return{abset} abbs_deps: Shallow dependencies.
-abbs_deps(){
-	abbscheckspec "$1"
-	abbs_set abbs_deps
-	local i names=()
-	# Process [num]-* too -- this sounds silly but that's how it works
-	for i in "$ABBS/repo/$1"/*
-	do
-		[ -d "$i" ] || continue
-		. "$i"/defines
-		names+=("$PKGNAME")
-		abbs_set_add abbs_deps $PKGDEP $BUILDDEP
-	done
-	abbs_set_del abbs_deps "${names[@]}"
-}
